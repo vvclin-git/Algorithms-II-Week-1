@@ -12,21 +12,22 @@ public class SAPBFS {
 	private HashMap<HashSet<Integer>, Integer> sapDist;
 	private HashMap<HashSet<Integer>, Integer> sapAncestor;
 	private HashMap<Integer, ArrayList<Bag<Integer>>> path;	
-	public SAPBFS(Digraph G, int s1, int s2) {
+	Digraph G;
+	public SAPBFS(Digraph G) {
 		marked = new boolean[G.V()];
         distTo = new int[G.V()];
         edgeTo = new int[G.V()];
         from = new int[G.V()];
         path = new HashMap<Integer, ArrayList<Bag<Integer>>>();
+        this.G = G;
+        sapDist = new HashMap<HashSet<Integer>, Integer>();
+        sapAncestor = new HashMap<HashSet<Integer>, Integer>();
+        path = new HashMap<Integer, ArrayList<Bag<Integer>>>();
         for (int v = 0; v < G.V(); v++)
             distTo[v] = INFINITY;
-        sapbfs(G, s1, s2);
+        
 	}
-	private void sapbfs(Digraph G, int v, int w) {
-		int ancestor;
-		HashSet<Integer> query = new HashSet<Integer>();
-		query.add(v);
-		query.add(w);
+	private void sapbfs(int v, int w) {		
 		//bfs from v
 		Queue<Integer> q = new Queue<Integer>();
 		q.enqueue(v);	       
@@ -67,40 +68,19 @@ public class SAPBFS {
 					from[vAdj] = w;					
 					q.enqueue(vAdj);
 				}
-				else {					
+				else {
+					StdOut.println("Merge at " + vAdj);
 					mergePath(from[vAdj], from[vTmp], vAdj, path);
 				}
 			}
 		}
 		// find SAP
-		distV = 0;
-		distW = 0;
-		for (Bag<Integer> bv : path.get(v)) {				
-			for (Bag<Integer> bw : path.get(w)) {				
-				ancestor = coV(bv, bw);
-				if (ancestor != -1) {
-					sapDist.put(query, distW + distV);
-					sapAncestor.put(query, ancestor)
-				}
-				distW += 1;
-			}
-			distV += 1;
-		}
-		
+		sap(v, w);		
     }
 	private void sapbfs(Digraph G, Iterable<Integer> v, Iterable<Integer> w) {				
 		
 	}
-	private int distVTo(int v) {
-		for (Bag<Integer> b : pathV.get(v)) {
-			for (int v1 : b) {
-				if (v == v1) {
-					return pathV.get(v).indexOf(b);
-				}
-			}
-		}
-		return -1;
-	}
+	
 	private void mergePath(int v, int w, int w1, HashMap<Integer, ArrayList<Bag<Integer>>> path) {
 		// join path of v & w at the joint point w1, w -> v
 		int joinInd = 0;
@@ -108,19 +88,41 @@ public class SAPBFS {
 			for (int v1 : b) {
 				if (v1 == w1) {
 					joinInd = path.get(v).indexOf(b) + 1;
+					StdOut.println(joinInd);
 				}
 			}
+			StdOut.println(path.get(v).size());
+			StdOut.print("stuff copied: ");
 			for (int i = joinInd; i < path.get(v).size(); i++) {
+				StdOut.print(path.get(v).get(i));
 				path.get(w).add(path.get(v).get(i));
 			}
+			StdOut.println();
 		}		
 	}
 	private void sap(int v, int w) {
-		for (Bag<Integer> b : path.get(v)) {
-			
+		int distV = 0;
+		int distW = 0;
+		int ancestor;		
+		HashSet<Integer> query = new HashSet<Integer>();
+		query.add(v);
+		query.add(w);
+		for (Bag<Integer> bv : path.get(v)) {				
+			for (Bag<Integer> bw : path.get(w)) {				
+				ancestor = coItem(bv, bw);
+				if (ancestor != -1) {
+					sapDist.put(query, distW + distV);
+					sapAncestor.put(query, ancestor);
+					return;
+				}
+				distW += 1;
+			}
+			distV += 1;
 		}
+		sapDist.put(query, -1);
+		sapAncestor.put(query, -1);
 	}
-	private int coV(Bag<Integer> bag1, Bag<Integer> bag2) {
+	private int coItem(Bag<Integer> bag1, Bag<Integer> bag2) {
 		for (int v1 : bag1) {
 			for (int v2 : bag2) {
 				if (v1 == v2) {
@@ -130,12 +132,46 @@ public class SAPBFS {
 		}
 		return -1;
 	}
-	public int getSapDist() {
-		return sapDist;
+	public int getSapDist(int v, int w) {
+		HashSet<Integer> query = new HashSet<Integer>();
+		query.add(v);
+		query.add(w);		
+		if (sapDist.containsKey(query)) {
+			return sapDist.get(query);
+		}
+		else {
+			sapbfs(v, w);
+			return sapDist.get(query);
+		}		
 	}
-	public int getAnscetor() {
-		return anscetor;
+	public int getSapAncestor(int v, int w) {
+		HashSet<Integer> query = new HashSet<Integer>();
+		query.add(v);
+		query.add(w);
+		printPath(v);
+		printPath(w);
+		if (sapAncestor.containsKey(query)) {
+			return sapAncestor.get(query);
+		}
+		else {
+			sapbfs(v, w);
+			return sapAncestor.get(query);
+		}
 	}
-
-	
+	private void printPath(int v) {
+		StdOut.println();
+		StdOut.print("Path from " + v + ": ");
+		for (Bag<Integer> i : path.get(v)) {
+			printBag(i);
+			StdOut.print("->");
+		}
+		StdOut.println();
+	}
+	private void printBag(Bag<Integer> i) {
+		StdOut.print("(");
+		for (int e : i) {
+			StdOut.print(e + ",");
+		}
+		StdOut.print(")");
+	}
 }
