@@ -34,7 +34,8 @@ public class SAPBFS {
 		int distV = 0;				
 		path.put(v, new ArrayList<Bag<Integer>>());	       
 		path.get(v).add(new Bag<Integer>());
-		path.get(v).get(distV).add(v);		
+		path.get(v).get(distV).add(v);
+		from[v] = v;
 		while (!q.isEmpty()) {
 			int vTmp = q.dequeue();			
 			distV += 1;
@@ -57,6 +58,7 @@ public class SAPBFS {
 		path.put(w, new ArrayList<Bag<Integer>>());	       
 		path.get(w).add(new Bag<Integer>());
 		path.get(w).get(distW).add(w);
+		from[w] = w;
 		while (!q.isEmpty()) {
 			int vTmp = q.dequeue();
 			distW += 1;
@@ -70,7 +72,18 @@ public class SAPBFS {
 				}
 				else {
 					StdOut.println("Merge at " + vAdj);
+					printPath(v);
+					printPath(w);
+					printPath(from[vAdj]);
+					printPath(from[vTmp]);					
+					StdOut.println();
+					//mergePath(from[vAdj], from[vTmp], vAdj, path);
 					mergePath(from[vAdj], from[vTmp], vAdj, path);
+					printPath(v);
+					printPath(w);
+					printPath(from[vAdj]);
+					printPath(from[vTmp]);					
+					StdOut.println();
 				}
 			}
 		}
@@ -87,17 +100,12 @@ public class SAPBFS {
 		for (Bag<Integer> b : path.get(v)) {
 			for (int v1 : b) {
 				if (v1 == w1) {
-					joinInd = path.get(v).indexOf(b) + 1;
-					StdOut.println(joinInd);
+					joinInd = path.get(v).indexOf(b) + 1;					
 				}
-			}
-			StdOut.println(path.get(v).size());
-			StdOut.print("stuff copied: ");
-			for (int i = joinInd; i < path.get(v).size(); i++) {
-				StdOut.print(path.get(v).get(i));
-				path.get(w).add(path.get(v).get(i));
-			}
-			StdOut.println();
+			}			
+		}		
+		for (int i = joinInd; i < path.get(v).size(); i++) {			
+			path.get(w).add(path.get(v).get(i));
 		}		
 	}
 	private void sap(int v, int w) {
@@ -107,10 +115,11 @@ public class SAPBFS {
 		HashSet<Integer> query = new HashSet<Integer>();
 		query.add(v);
 		query.add(w);
-		for (Bag<Integer> bv : path.get(v)) {				
+		for (Bag<Integer> bv : path.get(v)) {
+			distW = 0;
 			for (Bag<Integer> bw : path.get(w)) {				
 				ancestor = coItem(bv, bw);
-				if (ancestor != -1) {
+				if (ancestor != -1) {					
 					sapDist.put(query, distW + distV);
 					sapAncestor.put(query, ancestor);
 					return;
@@ -147,9 +156,7 @@ public class SAPBFS {
 	public int getSapAncestor(int v, int w) {
 		HashSet<Integer> query = new HashSet<Integer>();
 		query.add(v);
-		query.add(w);
-		printPath(v);
-		printPath(w);
+		query.add(w);		
 		if (sapAncestor.containsKey(query)) {
 			return sapAncestor.get(query);
 		}
@@ -164,8 +171,7 @@ public class SAPBFS {
 		for (Bag<Integer> i : path.get(v)) {
 			printBag(i);
 			StdOut.print("->");
-		}
-		StdOut.println();
+		}		
 	}
 	private void printBag(Bag<Integer> i) {
 		StdOut.print("(");
