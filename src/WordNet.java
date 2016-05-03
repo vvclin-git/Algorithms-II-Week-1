@@ -70,8 +70,8 @@ public class WordNet {
 		   int s2 = synMap.get(nounB);
 		   SAP sap = new SAP(hyperGraph);
 		   int ancestor = sap.ancestor(s1, s2);
-		   StdOut.println(ancestor);
-		   return "";
+		   StdOut.println(synArray[ancestor]);
+		   return synArray[ancestor];
 	   }
 
 	   // do unit testing of this class
@@ -86,7 +86,7 @@ public class WordNet {
 //		   StdOut.println(avgDeg / wn.hyperGraph.V());
 		   StdOut.println(wn.isNoun("sister"));
 		   StdOut.println(wn.isNoun("brother"));
-		   StdOut.println(wn.sap("sister", "brother"));
+		   StdOut.println(wn.sap("worm", "bird"));
 //		   StdOut.println(wn.sap("antihistamine", "nasal_decongestant"));
 	   }
 }

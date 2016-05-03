@@ -37,20 +37,22 @@ public class SAPBFS {
 		path.get(v).get(distV).add(v);
 		from[v] = v;
 		while (!q.isEmpty()) {			
-			int vTmp = q.dequeue();			
-			distV += 1;
-			path.get(v).add(new Bag<Integer>());
-			for (int vAdj : G.adj(vTmp)) {
-				path.get(v).get(distV).add(vAdj);
-				if (!marked[vAdj]) {						   
-					marked[vAdj] = true;
-					from[vAdj] = v;					
-					q.enqueue(vAdj);
+			int vTmp = q.dequeue();
+			if (G.outdegree(vTmp) > 0) {
+				distV += 1;
+				path.get(v).add(new Bag<Integer>());
+				for (int vAdj : G.adj(vTmp)) {
+					path.get(v).get(distV).add(vAdj);
+					if (!marked[vAdj]) {						   
+						marked[vAdj] = true;
+						from[vAdj] = v;					
+						q.enqueue(vAdj);
+					}
+					else {					
+						mergePath(from[vAdj], from[vTmp], vAdj, path);
+					}
 				}
-				else {					
-					mergePath(from[vAdj], from[vTmp], vAdj, path);
-				}
-			}
+			}			
 		}
 		//bfs from w
 		q.enqueue(w);
@@ -61,31 +63,22 @@ public class SAPBFS {
 		from[w] = w;
 		while (!q.isEmpty()) {			
 			int vTmp = q.dequeue();
-			distW += 1;
-			path.get(w).add(new Bag<Integer>());
-			for (int vAdj : G.adj(vTmp)) {
-				path.get(w).get(distW).add(vAdj);
-				if (!marked[vAdj]) {						   
-					marked[vAdj] = true;
-					from[vAdj] = w;					
-					q.enqueue(vAdj);
-				}
-				else {
-//					StdOut.println("Merge at " + vAdj);
-//					printPath(v);
-//					printPath(w);
-//					printPath(from[vAdj]);
-//					printPath(from[vTmp]);					
-//					StdOut.println();
-					//mergePath(from[vAdj], from[vTmp], vAdj, path);
-					mergePath(from[vAdj], from[vTmp], vAdj, path);
-					printPath(v);
-					printPath(w);
-//					printPath(from[vAdj]);
-//					printPath(from[vTmp]);					
-					StdOut.println();
+			if (G.outdegree(vTmp) > 0) {
+				distW += 1;
+				path.get(w).add(new Bag<Integer>());
+				for (int vAdj : G.adj(vTmp)) {
+					path.get(w).get(distW).add(vAdj);
+					if (!marked[vAdj]) {						   
+						marked[vAdj] = true;
+						from[vAdj] = w;					
+						q.enqueue(vAdj);
+					}
+					else {;
+						mergePath(from[vAdj], from[vTmp], vAdj, path);
+					}
 				}
 			}
+			
 		}
 		printPath(v);
 		printPath(w);
