@@ -7,19 +7,6 @@ public class WordNet {
 	Map<String, Integer> synMap;
 	Digraph hyperGraph;
 	String[] synArray;
-	private class SynSet extends Bag<String> {
-		public SynSet() {
-			
-		}
-		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof SynSet)) {
-				return false;
-			}	            
-	        
-	        
-		}
-	}
 	public WordNet(String synsets, String hypernyms) {
 		   String[] synLine;
 		   String[] hyperLine;
@@ -45,11 +32,9 @@ public class WordNet {
 			   hyperLine = hyperIn.readLine().split(",");
 			   synId = Integer.parseInt(hyperLine[0]);
 			   for (int i = 1; i < hyperLine.length ; i++) {
-//				   hyperGraph.addEdge(Integer.parseInt(hyperLine[i]), synId);
 				   hyperGraph.addEdge(synId, Integer.parseInt(hyperLine[i]));
 			   }			   
 		   }
-		   StdOut.println(synArray[80917]);
 	   }
 
 	   // returns all WordNet nouns
@@ -59,27 +44,30 @@ public class WordNet {
 
 	   // is the word a WordNet noun?
 	   public boolean isNoun(String word) {
-		   return synMap.containsKey(word);
+		   for (String key : synMap.keySet()) {
+			   
+		   }
 	   }
 
 	   // distance between nounA and nounB (defined below)
 	   public int distance(String nounA, String nounB) {
-		   if (!(isNoun(nounA) & isNoun(nounB))) {
-			   throw new java.lang.IllegalArgumentException();
-		   }
+//		   if (!(isNoun(nounA) & isNoun(nounB))) {
+//			   throws java.lang.IllegalArgumentException
+//		   }
 		   int s1 = synMap.get(nounA);
 		   int s2 = synMap.get(nounB);
 		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
 		   SAP sap = new SAP(hyperGraph);		   
-		   return sap.length(s1, s2);		   
+		   return sap.length(s1, s2);
+		   
 	   }
 
 	   // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
 	   // in a shortest ancestral path (defined below)
 	   public String sap(String nounA, String nounB) {	
-		   if (!(isNoun(nounA) & isNoun(nounB))) {
-			   throw new java.lang.IllegalArgumentException();
-		   }
+//		   if (!(isNoun(nounA) & isNoun(nounB))) {
+//		   throws java.lang.IllegalArgumentException
+//	   }
 		   int s1 = synMap.get(nounA);
 		   int s2 = synMap.get(nounB);
 		   SAP sap = new SAP(hyperGraph);
@@ -98,12 +86,9 @@ public class WordNet {
 //			   }
 //		   }
 //		   StdOut.println(avgDeg / wn.hyperGraph.V());
-		   
-		   StdOut.println(wn.isNoun("white_marlin"));
-		   StdOut.println(wn.isNoun("mileage"));
+		   StdOut.println(wn.isNoun("sister"));
+		   StdOut.println(wn.isNoun("brother"));
 		   StdOut.println(wn.sap("worm", "bird"));
-		   StdOut.println(wn.sap("white_marlin", "mileage"));
-		   StdOut.println(wn.distance("white_marlin", "mileage"));
 //		   StdOut.println(wn.sap("antihistamine", "nasal_decongestant"));
 	   }
 }
