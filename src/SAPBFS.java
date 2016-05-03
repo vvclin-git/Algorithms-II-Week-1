@@ -36,7 +36,7 @@ public class SAPBFS {
 		path.get(v).add(new Bag<Integer>());
 		path.get(v).get(distV).add(v);
 		from[v] = v;
-		while (!q.isEmpty()) {
+		while (!q.isEmpty()) {			
 			int vTmp = q.dequeue();			
 			distV += 1;
 			path.get(v).add(new Bag<Integer>());
@@ -59,7 +59,7 @@ public class SAPBFS {
 		path.get(w).add(new Bag<Integer>());
 		path.get(w).get(distW).add(w);
 		from[w] = w;
-		while (!q.isEmpty()) {
+		while (!q.isEmpty()) {			
 			int vTmp = q.dequeue();
 			distW += 1;
 			path.get(w).add(new Bag<Integer>());
@@ -71,22 +71,24 @@ public class SAPBFS {
 					q.enqueue(vAdj);
 				}
 				else {
-					StdOut.println("Merge at " + vAdj);
-					printPath(v);
-					printPath(w);
-					printPath(from[vAdj]);
-					printPath(from[vTmp]);					
-					StdOut.println();
+//					StdOut.println("Merge at " + vAdj);
+//					printPath(v);
+//					printPath(w);
+//					printPath(from[vAdj]);
+//					printPath(from[vTmp]);					
+//					StdOut.println();
 					//mergePath(from[vAdj], from[vTmp], vAdj, path);
 					mergePath(from[vAdj], from[vTmp], vAdj, path);
 					printPath(v);
 					printPath(w);
-					printPath(from[vAdj]);
-					printPath(from[vTmp]);					
+//					printPath(from[vAdj]);
+//					printPath(from[vTmp]);					
 					StdOut.println();
 				}
 			}
 		}
+		printPath(v);
+		printPath(w);
 		// find SAP
 		sap(v, w);		
     }

@@ -68,22 +68,25 @@ public class WordNet {
 //	   }
 		   int s1 = synMap.get(nounA);
 		   int s2 = synMap.get(nounB);
-		   SAP sap = new SAP(hyperGraph);		   
-		   return synArray[sap.ancestor(s1, s2)];
+		   SAP sap = new SAP(hyperGraph);
+		   int ancestor = sap.ancestor(s1, s2);
+		   StdOut.println(ancestor);
+		   return "";
 	   }
 
 	   // do unit testing of this class
 	   public static void main(String[] args) {
 		   WordNet wn = new WordNet("wordnet\\synsets.txt", "wordnet\\hypernyms.txt");
 		   double avgDeg = 0;
-		   for (int i = 0; i < wn.hyperGraph.V(); i++) {
-			   if (wn.hyperGraph.indegree(i) > 1) {
-				 StdOut.println(wn.hyperGraph.indegree(i));
-			   }
-		   }
-		   StdOut.println(avgDeg / wn.hyperGraph.V());
-		   StdOut.println(wn.isNoun("man"));
-		   StdOut.println(wn.isNoun("woman"));
-		   StdOut.println(wn.sap("antihistamine", "nasal_decongestant"));
+//		   for (int i = 0; i < wn.hyperGraph.V(); i++) {
+//			   if (wn.hyperGraph.indegree(i) > 1) {
+//				 StdOut.println(wn.hyperGraph.indegree(i));
+//			   }
+//		   }
+//		   StdOut.println(avgDeg / wn.hyperGraph.V());
+		   StdOut.println(wn.isNoun("sister"));
+		   StdOut.println(wn.isNoun("brother"));
+		   StdOut.println(wn.sap("sister", "brother"));
+//		   StdOut.println(wn.sap("antihistamine", "nasal_decongestant"));
 	   }
 }
