@@ -45,15 +45,18 @@ public class WordNet {
 	   // is the word a WordNet noun?
 	   public boolean isNoun(String word) {
 		   for (String key : synMap.keySet()) {
-			   
+			   if (key.toLowerCase().contains(word)) {
+				   return true;
+			   }
 		   }
+		   return false;
 	   }
 
 	   // distance between nounA and nounB (defined below)
 	   public int distance(String nounA, String nounB) {
-//		   if (!(isNoun(nounA) & isNoun(nounB))) {
-//			   throws java.lang.IllegalArgumentException
-//		   }
+		   if (!(isNoun(nounA) & isNoun(nounB))) {
+			   throw new java.lang.IllegalArgumentException();
+		   }
 		   int s1 = synMap.get(nounA);
 		   int s2 = synMap.get(nounB);
 		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
@@ -65,9 +68,9 @@ public class WordNet {
 	   // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
 	   // in a shortest ancestral path (defined below)
 	   public String sap(String nounA, String nounB) {	
-//		   if (!(isNoun(nounA) & isNoun(nounB))) {
-//		   throws java.lang.IllegalArgumentException
-//	   }
+		   if (!(isNoun(nounA) & isNoun(nounB))) {
+			   throw new java.lang.IllegalArgumentException();
+		   }
 		   int s1 = synMap.get(nounA);
 		   int s2 = synMap.get(nounB);
 		   SAP sap = new SAP(hyperGraph);
