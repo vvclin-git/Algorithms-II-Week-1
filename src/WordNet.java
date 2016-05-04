@@ -1,7 +1,4 @@
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import edu.princeton.cs.algs4.*;
 public class WordNet {
 	// constructor takes the name of the two input files
@@ -91,9 +88,8 @@ public class WordNet {
 			   throw new java.lang.IllegalArgumentException();
 		   }
 		   SAP sap = new SAP(hyperGraph);
-		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
-		   int ancestor = sap.ancestor(s1, s2);
-		   StdOut.println(synMap.get(ancestor));
+//		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
+		   int ancestor = sap.ancestor(s1, s2);		   
 		   return synMap.get(ancestor);
 	   }
 
@@ -107,9 +103,9 @@ public class WordNet {
 //			   }
 //		   }
 //		   StdOut.println(avgDeg / wn.hyperGraph.V());
-		   StdOut.println(wn.isNoun("sister"));
-		   StdOut.println(wn.isNoun("brother"));
-		   StdOut.println(wn.sap("worm", "bird"));
-//		   StdOut.println(wn.sap("antihistamine", "nasal_decongestant"));
+//		   StdOut.println(wn.isNoun("sister"));
+//		   StdOut.println(wn.isNoun("brother"));
+//		   StdOut.println(wn.sap("white_marlin", "mileage"));
+//		   StdOut.println(wn.distance("American_water_spaniel", "histology"));
 	   }
 }

@@ -80,8 +80,8 @@ public class SAPBFS {
 			}
 			
 		}
-		printPath(v);
-		printPath(w);
+//		printPath(v);
+//		printPath(w);
 		// find SAP
 		sap(v, w);		
     }
