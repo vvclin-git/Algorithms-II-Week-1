@@ -1,10 +1,11 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import edu.princeton.cs.algs4.*;
 public class WordNet {
 	// constructor takes the name of the two input files
-	Map<String, Integer> synMap;
+	ArrayList<String> synMap;
 	Digraph hyperGraph;
 	String[] synArray;
 	public WordNet(String synsets, String hypernyms) {
@@ -12,7 +13,7 @@ public class WordNet {
 		   String[] hyperLine;
 		   int synId; 
 		   int maxSynId = Integer.MIN_VALUE;
-		   synMap = new HashMap<String, Integer>();		   
+		   synMap = new ArrayList<String>();		   
 		   In synIn = new In(synsets);
 		   while (synIn.hasNextLine()) {
 			   synLine = synIn.readLine().split(",");
@@ -20,14 +21,11 @@ public class WordNet {
 			   if (synId >= maxSynId) {
 				   maxSynId = synId;
 			   }
-			   synMap.put(synLine[1], synId);
+			   synMap.add(synLine[1]);
 		   }
 		   In hyperIn = new In(hypernyms);
 		   hyperGraph = new Digraph(maxSynId + 1);
-		   synArray = new String[maxSynId + 1];
-		   for (String noun : synMap.keySet()) {
-			   synArray[synMap.get(noun)] = noun; 
-		   }
+		   synArray = new String[maxSynId + 1];		   
 		   while (hyperIn.hasNextLine()) {
 			   hyperLine = hyperIn.readLine().split(",");
 			   synId = Integer.parseInt(hyperLine[0]);
@@ -39,26 +37,45 @@ public class WordNet {
 
 	   // returns all WordNet nouns
 	   public Iterable<String> nouns() {
-		   return synMap.keySet();
+		   ArrayList<String> output = new ArrayList<String>();
+		   for (String s : synMap) {
+			   for(String n : s.split(" ")) {
+				   output.add(n);
+			   }
+		   }
+		   return output;
 	   }
 
 	   // is the word a WordNet noun?
 	   public boolean isNoun(String word) {
-		   for (String key : synMap.keySet()) {
-			   if (key.toLowerCase().contains(word)) {
-				   return true;
-			   }
+		   for (String s : synMap) {
+			   for (String n : s.split(" ")) {
+				   if (n.equals(word)) {
+					   return true;
+				   }
+			   }			   
 		   }
 		   return false;
 	   }
 
 	   // distance between nounA and nounB (defined below)
-	   public int distance(String nounA, String nounB) {
-		   if (!(isNoun(nounA) & isNoun(nounB))) {
+	   private int getSynId(String noun) {
+		   for (int i = 0; i < synMap.size(); i++) {
+			   for (String n : synMap.get(i).split(" ")) {
+				   //StdOut.println(n + ", " + i);
+				   if (n.equals(noun)) {
+					   return i;
+				   }
+			   }
+		   }
+		   return -1;
+	   }
+	   public int distance(String nounA, String nounB) {		   
+		   int s1 = getSynId(nounA);
+		   int s2 = getSynId(nounB);
+		   if ((s1 == -1 | s2 == -1)) {
 			   throw new java.lang.IllegalArgumentException();
 		   }
-		   int s1 = synMap.get(nounA);
-		   int s2 = synMap.get(nounB);
 		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
 		   SAP sap = new SAP(hyperGraph);		   
 		   return sap.length(s1, s2);
@@ -68,15 +85,16 @@ public class WordNet {
 	   // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
 	   // in a shortest ancestral path (defined below)
 	   public String sap(String nounA, String nounB) {	
-		   if (!(isNoun(nounA) & isNoun(nounB))) {
+		   int s1 = getSynId(nounA);
+		   int s2 = getSynId(nounB);
+		   if ((s1 == -1 | s2 == -1)) {
 			   throw new java.lang.IllegalArgumentException();
 		   }
-		   int s1 = synMap.get(nounA);
-		   int s2 = synMap.get(nounB);
 		   SAP sap = new SAP(hyperGraph);
+		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
 		   int ancestor = sap.ancestor(s1, s2);
-		   StdOut.println(synArray[ancestor]);
-		   return synArray[ancestor];
+		   StdOut.println(synMap.get(ancestor));
+		   return synMap.get(ancestor);
 	   }
 
 	   // do unit testing of this class
