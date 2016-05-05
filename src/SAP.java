@@ -13,8 +13,6 @@ public class SAP {
 	
 	private SAPBFS sapbfs;
 	private Digraph G;	
-	
-	
     
 	   // constructor takes a digraph (not necessarily a DAG)
 	   public SAP(Digraph G) {

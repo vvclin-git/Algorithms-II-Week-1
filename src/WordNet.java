@@ -5,6 +5,7 @@ public class WordNet {
 	ArrayList<String> synMap;
 	Digraph hyperGraph;
 	String[] synArray;
+	SAP sap;
 	public WordNet(String synsets, String hypernyms) {
 		   String[] synLine;
 		   String[] hyperLine;
@@ -30,6 +31,7 @@ public class WordNet {
 				   hyperGraph.addEdge(synId, Integer.parseInt(hyperLine[i]));
 			   }			   
 		   }
+		   sap = new SAP(hyperGraph);
 	   }
 
 	   // returns all WordNet nouns
@@ -74,7 +76,7 @@ public class WordNet {
 			   throw new java.lang.IllegalArgumentException();
 		   }
 		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
-		   SAP sap = new SAP(hyperGraph);		   
+//		   SAP sap = new SAP(hyperGraph);		   
 		   return sap.length(s1, s2);
 		   
 	   }
@@ -87,16 +89,23 @@ public class WordNet {
 		   if ((s1 == -1 | s2 == -1)) {
 			   throw new java.lang.IllegalArgumentException();
 		   }
-		   SAP sap = new SAP(hyperGraph);
+//		   SAP sap = new SAP(hyperGraph);
 //		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
 		   int ancestor = sap.ancestor(s1, s2);		   
 		   return synMap.get(ancestor);
 	   }
-
+	   public String sapAncestorDebug(int s1, int s2) {		   
+		   return synMap.get(sap.ancestor(s1, s2));
+	   }
+	   public int sapDistDebug(int s1, int s2) {		   
+		   return sap.length(s1, s2);
+	   }
 	   // do unit testing of this class
 	   public static void main(String[] args) {
 		   WordNet wn = new WordNet("wordnet\\synsets.txt", "wordnet\\hypernyms.txt");
-		   double avgDeg = 0;
+//		   StdOut.println(wn.sapAncestorDebug(81681, 24306));
+//		   StdOut.println(wn.sapDistDebug(80917, 54384)); //white_marlin, mileage
+//		   StdOut.println(wn.sapAncestorDebug(80917, 54384));
 //		   for (int i = 0; i < wn.hyperGraph.V(); i++) {
 //			   if (wn.hyperGraph.indegree(i) > 1) {
 //				 StdOut.println(wn.hyperGraph.indegree(i));
@@ -106,6 +115,8 @@ public class WordNet {
 //		   StdOut.println(wn.isNoun("sister"));
 //		   StdOut.println(wn.isNoun("brother"));
 //		   StdOut.println(wn.sap("white_marlin", "mileage"));
+		   StdOut.println(wn.sap("demotion", "variation"));
+//		   StdOut.println(wn.sapAncestorDebug(33756, 50757));
 //		   StdOut.println(wn.distance("American_water_spaniel", "histology"));
 	   }
 }
