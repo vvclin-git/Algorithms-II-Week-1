@@ -31,6 +31,9 @@ public class WordNet {
 				   hyperGraph.addEdge(synId, Integer.parseInt(hyperLine[i]));
 			   }			   
 		   }
+		   if (!isValidGraph(hyperGraph)) {
+			   throw new java.lang.IllegalArgumentException();
+		   }
 		   sap = new SAP(hyperGraph);
 	   }
 
@@ -58,7 +61,7 @@ public class WordNet {
 	   }
 
 	   // distance between nounA and nounB (defined below)
-	   public int getSynId(String noun) {
+	   private int getSynId(String noun) {
 		   for (int i = 0; i < synMap.size(); i++) {
 			   for (String n : synMap.get(i).split(" ")) {
 				   //StdOut.println(n + ", " + i);
@@ -69,28 +72,13 @@ public class WordNet {
 		   }
 		   return -1;
 	   }
-	   public ArrayList<Integer> getSynIds(String noun) {
-		   ArrayList<Integer> output = new ArrayList<Integer>();
-		   for (int i = 0; i < synMap.size(); i++) {
-//			   if (synMap.get(i).contains(" " + noun + " ")) {
-//				   output.add(i);
-//			   }
-			   for (String n : synMap.get(i).split(" ")) {
-				   //StdOut.println(n + ", " + i);
-				   if (n.equals(noun)) {
-					   output.add(i);
-				   }
-			   }
-		   }
-		   return output;
-	   }
 	   public int distance(String nounA, String nounB) {		   
-		   ArrayList<Integer> s1 = getSynIds(nounA);
-		   ArrayList<Integer> s2 = getSynIds(nounA);
-		   if ((s1.size() == 0 | s2.size() == 0)) {
+		   int s1 = getSynId(nounA);
+		   int s2 = getSynId(nounB);
+		   if ((s1 == -1 | s2 == -1)) {
 			   throw new java.lang.IllegalArgumentException();
 		   }
-//		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
+		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
 //		   SAP sap = new SAP(hyperGraph);		   
 		   return sap.length(s1, s2);
 		   
@@ -99,15 +87,32 @@ public class WordNet {
 	   // a synset (second field of synsets.txt) that is the common ancestor of nounA and nounB
 	   // in a shortest ancestral path (defined below)
 	   public String sap(String nounA, String nounB) {	
-		   ArrayList<Integer> s1 = getSynIds(nounA);
-		   ArrayList<Integer> s2 = getSynIds(nounA);
-		   if ((s1.size() == 0 | s2.size() == 0)) {
+		   int s1 = getSynId(nounA);
+		   int s2 = getSynId(nounB);
+		   if ((s1 == -1 | s2 == -1)) {
 			   throw new java.lang.IllegalArgumentException();
 		   }
 //		   SAP sap = new SAP(hyperGraph);
 //		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
 		   int ancestor = sap.ancestor(s1, s2);		   
 		   return synMap.get(ancestor);
+	   }
+	   private boolean isValidGraph(Digraph G) {
+		   // test if the graph is a rooted DAG
+		   Topological to = new Topological(G);
+		   int rootNum = 0;
+		   if (to.hasOrder()) {
+			   for (int v = 0; v < G.V(); v++) {
+				   if (G.outdegree(v) == 0) {
+					   rootNum += 1;
+				   }
+				   if (rootNum > 1) {
+					   return false;
+				   }
+			   }
+			   return true;
+		   }
+		   return false;		   
 	   }
 	   public String sapAncestorDebug(int s1, int s2) {		   
 		   return synMap.get(sap.ancestor(s1, s2));
@@ -131,11 +136,7 @@ public class WordNet {
 //		   StdOut.println(wn.isNoun("brother"));
 //		   StdOut.println(wn.sap("white_marlin", "mileage"));
 //		   StdOut.println(wn.sap("demotion", "variation"));
-//		   StdOut.println(wn.sapDistDebug(33756, 50757));
-//		   StdOut.println(wn.sapDistDebug(50757, 33756));
+//		   StdOut.println(wn.sapAncestorDebug(33756, 50757));
 //		   StdOut.println(wn.distance("American_water_spaniel", "histology"));
-		   for (int i : wn.getSynIds("horse")) {
-			   StdOut.println(i);
-		   };
 	   }
 }

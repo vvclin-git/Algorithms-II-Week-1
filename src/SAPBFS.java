@@ -17,76 +17,110 @@ public class SAPBFS {
 		marked = new boolean[G.V()];
         distTo = new int[G.V()];
         edgeTo = new int[G.V()];
-        from = new int[G.V()];
-        path = new HashMap<Integer, ArrayList<Bag<Integer>>>();
+        from = new int[G.V()];        
         this.G = G;
         sapDist = new HashMap<HashSet<Integer>, Integer>();
         sapAncestor = new HashMap<HashSet<Integer>, Integer>();
-        path = new HashMap<Integer, ArrayList<Bag<Integer>>>();
-        for (int v = 0; v < G.V(); v++)
-            distTo[v] = INFINITY;
-        
+        path = new HashMap<Integer, ArrayList<Bag<Integer>>>();        
 	}
 	private void sapbfs(int v, int w) {		
 		//bfs from v
-		Queue<Integer> q = new Queue<Integer>();
-		q.enqueue(v);	       
-		int distV = 0;				
-		path.put(v, new ArrayList<Bag<Integer>>());	       
-		path.get(v).add(new Bag<Integer>());
-		path.get(v).get(distV).add(v);
-		from[v] = v;
-		while (!q.isEmpty()) {			
-			int vTmp = q.dequeue();
-			if (G.outdegree(vTmp) > 0) {
-				distV += 1;
-				path.get(v).add(new Bag<Integer>());
-				for (int vAdj : G.adj(vTmp)) {
-					path.get(v).get(distV).add(vAdj);
-					if (!marked[vAdj]) {						   
-						marked[vAdj] = true;
-						from[vAdj] = v;					
-						q.enqueue(vAdj);
-					}
-					else {					
-						mergePath(from[vAdj], from[vTmp], vAdj, path);
-					}
-				}
-			}			
-		}
-		//bfs from w
-		q.enqueue(w);
-		int distW = 0;				
-		path.put(w, new ArrayList<Bag<Integer>>());	       
-		path.get(w).add(new Bag<Integer>());
-		path.get(w).get(distW).add(w);
-		from[w] = w;
-		while (!q.isEmpty()) {			
-			int vTmp = q.dequeue();
-			if (G.outdegree(vTmp) > 0) {
-				distW += 1;
-				path.get(w).add(new Bag<Integer>());
-				for (int vAdj : G.adj(vTmp)) {
-					path.get(w).get(distW).add(vAdj);
-					if (!marked[vAdj]) {						   
-						marked[vAdj] = true;
-						from[vAdj] = w;					
-						q.enqueue(vAdj);
-					}
-					else {;
-						mergePath(from[vAdj], from[vTmp], vAdj, path);
-					}
-				}
-			}
-			
-		}
+//		Queue<Integer> q = new Queue<Integer>();
+//		q.enqueue(v);	       
+//		int distV = 0;				
+//		path.put(v, new ArrayList<Bag<Integer>>());	       
+//		path.get(v).add(new Bag<Integer>());
+//		path.get(v).get(distV).add(v);
+//		from[v] = v;
+//		while (!q.isEmpty()) {			
+//			int vTmp = q.dequeue();
+//			if (G.outdegree(vTmp) > 0) {
+//				distV += 1;
+//				path.get(v).add(new Bag<Integer>());
+//				for (int vAdj : G.adj(vTmp)) {
+//					path.get(v).get(distV).add(vAdj);
+//					if (!marked[vAdj]) {						   
+//						marked[vAdj] = true;
+//						from[vAdj] = v;					
+//						q.enqueue(vAdj);
+//					}
+//					else {					
+//						mergePath(from[vAdj], from[vTmp], vAdj, path);
+//					}
+//				}
+//			}			
+//		}
+//		bfs from w
+//		q.enqueue(w);
+//		int distW = 0;				
+//		path.put(w, new ArrayList<Bag<Integer>>());	       
+//		path.get(w).add(new Bag<Integer>());
+//		path.get(w).get(distW).add(w);
+//		from[w] = w;
+//		while (!q.isEmpty()) {			
+//			int vTmp = q.dequeue();
+//			if (G.outdegree(vTmp) > 0) {
+//				distW += 1;
+//				path.get(w).add(new Bag<Integer>());
+//				for (int vAdj : G.adj(vTmp)) {
+//					path.get(w).get(distW).add(vAdj);
+//					if (!marked[vAdj]) {						   
+//						marked[vAdj] = true;
+//						from[vAdj] = w;					
+//						q.enqueue(vAdj);
+//					}
+//					else {;
+//						mergePath(from[vAdj], from[vTmp], vAdj, path);
+//					}
+//				}
+//			}
+//			
+//		}
 //		printPath(v);
 //		printPath(w);
+		pathbfs(v);
+		pathbfs(w);
 		// find SAP
 		sap(v, w);		
     }
-	private void sapbfs(Digraph G, Iterable<Integer> v, Iterable<Integer> w) {				
-		
+	private void pathbfs(int v) {
+		Queue<Integer> q = new Queue<Integer>();
+		q.enqueue(v);	       
+		int distV = 0;
+		if (!path.containsKey(v)) {
+			path.put(v, new ArrayList<Bag<Integer>>());	       
+			path.get(v).add(new Bag<Integer>());
+			path.get(v).get(distV).add(v);
+			from[v] = v;
+			while (!q.isEmpty()) {			
+				int vTmp = q.dequeue();
+				if (G.outdegree(vTmp) > 0) {
+					distV += 1;
+					path.get(v).add(new Bag<Integer>());
+					for (int vAdj : G.adj(vTmp)) {
+						path.get(v).get(distV).add(vAdj);
+						if (!marked[vAdj]) {						   
+							marked[vAdj] = true;
+							from[vAdj] = v;					
+							q.enqueue(vAdj);
+						}
+						else {					
+							mergePath(from[vAdj], from[vTmp], vAdj, path);
+						}
+					}
+				}			
+			}
+		}		
+	}
+	private void sapbfs(Digraph G, Iterable<Integer> v, Iterable<Integer> w) {		
+		for (int v1 : v) {
+			for (int w1 : w) {
+				pathbfs(w1);
+				pathbfs(v1);
+				sap(v1, w1);
+				
+			}			
+		}		
 	}
 	
 	private void mergePath(int v, int w, int w1, HashMap<Integer, ArrayList<Bag<Integer>>> path) {
@@ -110,21 +144,23 @@ public class SAPBFS {
 		HashSet<Integer> query = new HashSet<Integer>();
 		query.add(v);
 		query.add(w);
-		for (Bag<Integer> bv : path.get(v)) {
-			distW = 0;
-			for (Bag<Integer> bw : path.get(w)) {				
-				ancestor = coItem(bv, bw);
-				if (ancestor != -1) {					
-					sapDist.put(query, distW + distV);
-					sapAncestor.put(query, ancestor);
-					return;
+		if (!sapDist.containsKey(query)) {
+			for (Bag<Integer> bv : path.get(v)) {
+				distW = 0;
+				for (Bag<Integer> bw : path.get(w)) {				
+					ancestor = coItem(bv, bw);
+					if (ancestor != -1) {					
+						sapDist.put(query, distW + distV);
+						sapAncestor.put(query, ancestor);
+						return;
+					}
+					distW += 1;
 				}
-				distW += 1;
+				distV += 1;
 			}
-			distV += 1;
-		}
-		sapDist.put(query, -1);
-		sapAncestor.put(query, -1);
+			sapDist.put(query, -1);
+			sapAncestor.put(query, -1);
+		}		
 	}
 	private int coItem(Bag<Integer> bag1, Bag<Integer> bag2) {
 		for (int v1 : bag1) {
@@ -139,14 +175,59 @@ public class SAPBFS {
 	public int getSapDist(int v, int w) {
 		HashSet<Integer> query = new HashSet<Integer>();
 		query.add(v);
-		query.add(w);		
+		query.add(w);
+//		printPath(v);
+//		printPath(w);
 		if (sapDist.containsKey(query)) {
 			return sapDist.get(query);
 		}
 		else {			
 			sapbfs(v, w);
 			return sapDist.get(query);
-		}		
+		}
+
+	}
+	public int getSapDist(Iterable<Integer> v, Iterable<Integer> w) {
+		int minDist = Integer.MAX_VALUE;
+		int tmpDist;		
+		for (int v1 : v) {
+			for (int w1 : w) {
+				HashSet<Integer> query = new HashSet<Integer>();
+				query.add(v1);
+				query.add(w1);
+				if (!sapDist.containsKey(query)) {
+					sapbfs(v1, w1);										
+				}				
+				//StdOut.println(path.size());
+				tmpDist = sapDist.get(query);
+				//StdOut.println(tmpDist + "| " + v1 + ", " + w1);
+				if (tmpDist <= minDist) {
+					minDist = tmpDist;					
+				}				
+			}
+		}
+		return minDist;		
+	}
+	public int getSapAncestor(Iterable<Integer> v, Iterable<Integer> w) {
+		int minDist = Integer.MAX_VALUE;
+		int tmpDist;
+		int minAncestor = -1;
+		for (int v1 : v) {
+			for (int w1 : w) {
+				HashSet<Integer> query = new HashSet<Integer>();
+				query.add(v1);
+				query.add(w1);
+				if (!sapDist.containsKey(query)) {
+					sapbfs(v1, w1);										
+				}
+				tmpDist = sapDist.get(query);
+				if (tmpDist <= minDist) {
+					tmpDist = minDist;
+					minAncestor = sapAncestor.get(query);
+				}				
+			}
+		}
+		return minAncestor;
 	}
 	public int getSapAncestor(int v, int w) {
 		HashSet<Integer> query = new HashSet<Integer>();
