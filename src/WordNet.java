@@ -34,6 +34,7 @@ public class WordNet {
 				   }
 				   else {
 					   synMap.put(n, new Bag<Integer>());
+					   synMap.get(n).add(synId);
 				   }
 			   }
 		   }
@@ -74,6 +75,9 @@ public class WordNet {
 //			   }			   
 //		   }
 //		   return false;
+		   if (word == null) {
+			   throw new java.lang.NullPointerException(); 
+		   }
 		   return synMap.containsKey(word);
 	   }
 
@@ -108,11 +112,17 @@ public class WordNet {
 	   public int distance(String nounA, String nounB) {		   
 //		   ArrayList<Integer> s1 = getSynIds(nounA);
 //		   ArrayList<Integer> s2 = getSynIds(nounB);
-		   Bag<Integer> s1 = getSynIds(nounA);
-		   Bag<Integer> s2 = getSynIds(nounB);
-		   if ((s1.size() == 0 | s2.size() == 0)) {
+		   if (!(isNoun(nounA) & isNoun(nounB))) {
 			   throw new java.lang.IllegalArgumentException();
 		   }
+		   Bag<Integer> s1 = getSynIds(nounA);
+		   Bag<Integer> s2 = getSynIds(nounB);
+		   
+//		   if ((s1.size() == 0 | s2.size() == 0)) {
+//			   StdOut.println("nounA: " + nounA);
+//			   StdOut.println("nounB: " + nounB);
+//			   throw new java.lang.IllegalArgumentException;
+//		   }
 //		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
 //		   SAP sap = new SAP(hyperGraph);		   
 		   return sap.length(s1, s2);
@@ -124,11 +134,14 @@ public class WordNet {
 	   public String sap(String nounA, String nounB) {	
 //		   ArrayList<Integer> s1 = getSynIds(nounA);
 //		   ArrayList<Integer> s2 = getSynIds(nounB);
-		   Bag<Integer> s1 = getSynIds(nounA);
-		   Bag<Integer> s2 = getSynIds(nounB);
-		   if ((s1.size() == 0 | s2.size() == 0)) {
+		   if (!(isNoun(nounA) & isNoun(nounB))) {
 			   throw new java.lang.IllegalArgumentException();
 		   }
+		   Bag<Integer> s1 = getSynIds(nounA);
+		   Bag<Integer> s2 = getSynIds(nounB);
+//		   if ((s1.size() == 0 | s2.size() == 0)) {
+//			   throw new java.lang.IllegalArgumentException();
+//		   }
 //		   SAP sap = new SAP(hyperGraph);
 //		   StdOut.println("nounA: " + s1 + " nounB: " + s2); 
 		   int ancestor = sap.ancestor(s1, s2);		   
@@ -140,6 +153,11 @@ public class WordNet {
 	   }
 	   private int sapDistDebug(int s1, int s2) {		   
 		   return sap.length(s1, s2);
+	   }
+	   private void printSynIds(String noun) {
+		   for (int s : synMap.get(noun)) {
+			   StdOut.println(s);
+		   }		   
 	   }
 	   private boolean isValidGraph(Digraph G) {
 		   // test if the graph is a rooted DAG
@@ -161,7 +179,8 @@ public class WordNet {
 	   // do unit testing of this class
 	   public static void main(String[] args) {
 //		   WordNet wn = new WordNet("wordnet\\synsets.txt", "wordnet\\hypernyms6InvalidTwoRoots.txt");
-		   WordNet wn = new WordNet("wordnet\\synsets.txt", "wordnet\\hypernyms.txt");
+//		   WordNet wn = new WordNet("wordnet\\synsets.txt", "wordnet\\hypernyms.txt");
+		   WordNet wn = new WordNet("wordnet\\synsets15.txt", "wordnet\\hypernyms15Tree.txt");
 //		   StdOut.println(wn.sapAncestorDebug(81681, 24306));
 //		   StdOut.println(wn.sapDistDebug(80917, 54384)); //white_marlin, mileage
 //		   StdOut.println(wn.sapAncestorDebug(80917, 54384));
@@ -182,8 +201,13 @@ public class WordNet {
 //			   StdOut.println(i);
 //		   };
 //		   StdOut.println(wn.distance("worm", "bird"));
-		   StdOut.println(wn.sap("worm", "bird"));
+//		   StdOut.println(wn.sap("worm", "bird"));
 //		   StdOut.println(wn.sapDistDebug(81682, 33764));
+		   StdOut.println(wn.isNoun("simple_protein"));
+		   StdOut.println(wn.isNoun("work_stoppage"));
+		   StdOut.println(wn.isNoun("b"));
+		   StdOut.println(wn.distance("invalid", "b"));
+		   
 	   }
 }
 

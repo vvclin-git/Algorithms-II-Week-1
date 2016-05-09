@@ -27,7 +27,7 @@ public class SAP {
 		   resetDist();
 	   }	   
 	   //length of shortest ancestral path between v and w; -1 if no such path
-	   public int length(int v, int w) {
+	   public int length(int v, int w) {		   
 		   HashSet<Integer> query = new HashSet<Integer>();
 		   query.add(v);
 		   query.add(w);
@@ -58,8 +58,14 @@ public class SAP {
 	   public int length(Iterable<Integer> v, Iterable<Integer> w) {
 		   int minDist = INFINITY;
 		   int tmpDist;
-		   for (int v1 : v) {
-			   for (int w1 : w) {
+		   if (v == null | w == null) {
+			   throw new java.lang.NullPointerException();
+		   }
+		   for (Integer v1 : v) {
+			   for (Integer w1 : w) {
+				   if (v1 == null | w1 == null) {
+					   throw new java.lang.NullPointerException();
+				   }
 				   tmpDist = length(v1, w1);
 				   if (tmpDist < minDist & tmpDist > 0) {
 					   minDist = tmpDist;
@@ -80,8 +86,14 @@ public class SAP {
 		   int minDist = INFINITY;
 		   int tmpDist;
 		   int ancestor = -1;
-		   for (int v1 : v) {
-			   for (int w1 : w) {
+		   if (v == null | w == null) {
+			   throw new java.lang.NullPointerException();
+		   }
+		   for (Integer v1 : v) {
+			   for (Integer w1 : w) {
+				   if (v1 == null | w1 == null) {
+					   throw new java.lang.NullPointerException();
+				   }
 				   tmpDist = length(v1, w1);
 				   if (tmpDist < minDist & tmpDist > 0) {
 					   minDist = tmpDist;
@@ -109,7 +121,7 @@ public class SAP {
 		   bfs(w, distW);		   
 		   for (int i = 0; i < G.V(); i++) {
 			   tmpDist = distV[i] + distW[i];			   
-			   if (tmpDist < minDist & tmpDist > 0) {
+			   if (tmpDist < minDist & tmpDist >= 0) {
 				   minDist = tmpDist;
 				   ancestor = i;
 			   }
