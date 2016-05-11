@@ -15,13 +15,15 @@ public class SAP {
 	private Digraph G;	
 	private HashMap<HashSet<Integer>, Integer> sapDist;
 	private HashMap<HashSet<Integer>, Integer> sapAncestor;
-	private int[] distV, distW;
+	private int[] distV, distW, pathV, pathW;
 	private boolean marked[];
 	   // constructor takes a digraph (not necessarily a DAG)
 	   public SAP(Digraph G) {
 		   this.G = G;
 		   this.distV = new int[G.V()];
 		   this.distW = new int[G.V()];
+		   this.pathV = new int[G.V()];
+		   this.pathW = new int[G.V()];
 		   this.sapDist = new HashMap<HashSet<Integer>, Integer>();
 		   this.sapAncestor = new HashMap<HashSet<Integer>, Integer>();
 		   resetDist();
@@ -32,6 +34,9 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapDist.containsKey(query)) {
+			   resetDist();		   
+			   bfs(v, distV, pathV);
+			   bfs(w, distW, pathW);
 			   sap(v, w);
 			   return sapDist.get(query);
 		   }
@@ -46,6 +51,9 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapAncestor.containsKey(query)) {
+			   resetDist();		   
+			   bfs(v, distV, pathV);
+			   bfs(w, distW, pathW);
 			   sap(v, w);
 			   return sapAncestor.get(query);
 		   }
@@ -110,15 +118,34 @@ public class SAP {
 		   }
 	   }
 	   private void sap(int v, int w) {
-		   int minDist = INFINITY;
+		   int minDist = INFINITY;		   
 		   int tmpDist;
 		   int ancestor = -1;
 		   HashSet<Integer> query = new HashSet<Integer>();
 		   query.add(v);
 		   query.add(w);
-		   resetDist();		   
-		   bfs(v, distV);
-		   bfs(w, distW);		   
+		   for (int x = v; pathV[x]; x = pathV[x]) {
+			   if (distW[x] != INFINITY) {
+				   tmpDist = distV[x] + distW[x];
+				   if (tmpDist <= minDist) {
+					   minDist = tmpDist;
+					   ancestor = x;
+				   }
+				   else {
+					   break;
+				   }
+			   }
+		   }
+		   sapDist.put(query, minDist);
+		   sapAncestor.put(query, ancestor);		   
+	   }
+	   private void sap1(int v, int w) {
+		   int minDist = INFINITY;
+		   int tmpDist;
+		   int ancestor = -1;
+		   HashSet<Integer> query = new HashSet<Integer>();
+		   query.add(v);
+		   query.add(w);		   		   
 		   for (int i = 0; i < G.V(); i++) {
 			   tmpDist = distV[i] + distW[i];			   
 			   if (tmpDist < minDist & tmpDist >= 0) {
@@ -135,17 +162,20 @@ public class SAP {
 			   sapAncestor.put(query, -1);
 		   }
 	   }
-	   private void bfs(int s, int[] distTo) {
-		   marked = new boolean[G.V()];
+	   private void bfs(int s, int[] distTo, int[] pathTo) {
+		   StdOut.println("bfs");
+		   marked = new boolean[distTo.length];
 		   Queue<Integer> q = new Queue<Integer>();
 		   marked[s] = true;
 		   distTo[s] = 0;
+		   pathTo[s] = 0;
 		   q.enqueue(s);
 		   while (!q.isEmpty()) {
 			   int v = q.dequeue();
 			   for (int w : G.adj(v)) {
 				   if (!marked[w]) {					   
 					   distTo[w] = distTo[v] + 1;
+					   pathTo[w] = v;
 					   marked[w] = true;
 					   q.enqueue(w);
 				   }
