@@ -121,18 +121,27 @@ public class SAP {
 		   int minDist = INFINITY;		   
 		   int tmpDist;
 		   int ancestor = -1;
+		   int x;
 		   HashSet<Integer> query = new HashSet<Integer>();
 		   query.add(v);
 		   query.add(w);
-		   for (int x = v; pathV[x]; x = pathV[x]) {
-			   if (distW[x] != INFINITY) {
-				   tmpDist = distV[x] + distW[x];
-				   if (tmpDist <= minDist) {
-					   minDist = tmpDist;
-					   ancestor = x;
-				   }
-				   else {
-					   break;
+		   Queue<Integer> pathFind = new Queue<Integer>();
+		   pathFind.enqueue(v);
+		   while (!pathFind.isEmpty()) {
+			   x = pathFind.dequeue();
+			   for (int x1 : G.adj(x)) {
+				   if (distW[x1] != INFINITY) {
+					   tmpDist = distV[x1] + distW[x1];
+					   if (tmpDist <= minDist) {
+						   minDist = tmpDist;
+						   ancestor = x1;
+						   pathFind.enqueue(x1);
+					   }
+					   else {
+						   sapDist.put(query, minDist);
+						   sapAncestor.put(query, ancestor);
+						   return;
+					   }
 				   }
 			   }
 		   }
@@ -145,7 +154,7 @@ public class SAP {
 		   int ancestor = -1;
 		   HashSet<Integer> query = new HashSet<Integer>();
 		   query.add(v);
-		   query.add(w);		   		   
+		   query.add(w);		   
 		   for (int i = 0; i < G.V(); i++) {
 			   tmpDist = distV[i] + distW[i];			   
 			   if (tmpDist < minDist & tmpDist >= 0) {
@@ -163,7 +172,7 @@ public class SAP {
 		   }
 	   }
 	   private void bfs(int s, int[] distTo, int[] pathTo) {
-		   StdOut.println("bfs");
+		   
 		   marked = new boolean[distTo.length];
 		   Queue<Integer> q = new Queue<Integer>();
 		   marked[s] = true;
@@ -182,6 +191,14 @@ public class SAP {
 			   }
 		   }
 	   }
+	   private Iterable<Integer> pathTo(int v, int[] distTo, int[] edgeTo) {	        
+	        Stack<Integer> path = new Stack<Integer>();
+	        int x;
+	        for (x = v; distTo[x] != 0; x = edgeTo[x])
+	            path.push(x);
+	        path.push(x);
+	        return path;
+	    }
 	   private void printArray(int[] array) {
 		   for (int i = 0; i < array.length; i++) {
 			   StdOut.print(array[i] + ", ");
