@@ -16,7 +16,8 @@ public class SAP {
 	private HashMap<HashSet<Integer>, Integer> sapDist;
 	private HashMap<HashSet<Integer>, Integer> sapAncestor;
 	private int[] distV, distW, pathV, pathW;
-	private boolean marked[];
+	private int[] marked;
+//	private boolean marked[];
 	   // constructor takes a digraph (not necessarily a DAG)
 	   public SAP(Digraph G) {
 		   this.G = G;
@@ -24,6 +25,7 @@ public class SAP {
 		   this.distW = new int[G.V()];
 		   this.pathV = new int[G.V()];
 		   this.pathW = new int[G.V()];
+		   this.marked = new int[G.V()];
 		   this.sapDist = new HashMap<HashSet<Integer>, Integer>();
 		   this.sapAncestor = new HashMap<HashSet<Integer>, Integer>();
 		   resetDist();
@@ -36,7 +38,9 @@ public class SAP {
 		   if (!sapDist.containsKey(query)) {
 			   resetDist();		   
 			   bfs(v, distV, pathV);
+			   			   
 			   bfs(w, distW, pathW);
+			   
 			   sap(v, w);
 			   return sapDist.get(query);
 		   }
@@ -127,26 +131,43 @@ public class SAP {
 		   query.add(w);
 		   Queue<Integer> pathFind = new Queue<Integer>();
 		   pathFind.enqueue(v);
+		   pathFind.enqueue(w);
+		   marked[v] = v;
+		   marked[w] = w;
+		   //printArray(marked);
 		   while (!pathFind.isEmpty()) {
 			   x = pathFind.dequeue();
-			   for (int x1 : G.adj(x)) {
-				   if (distW[x1] != INFINITY) {
-					   tmpDist = distV[x1] + distW[x1];
-					   if (tmpDist <= minDist) {
-						   minDist = tmpDist;
-						   ancestor = x1;
-						   pathFind.enqueue(x1);
-					   }
-					   else {
-						   sapDist.put(query, minDist);
+			   StdOut.println(x);
+			   printArray(marked);
+			   for (int x1 : G.adj(x)) {				   
+				   if (marked[x1] != marked[x]) {
+					   
+					 tmpDist = distV[x1] + distW[x1];
+					 if (tmpDist <= minDist) {
+						 minDist = tmpDist;
+						 ancestor = x1;
+					 }
+					 else {
+						 sapDist.put(query, minDist);
 						   sapAncestor.put(query, ancestor);
 						   return;
-					   }
+					 }
 				   }
+				   else {
+					   pathFind.enqueue(x1);
+				   }
+				   
 			   }
 		   }
-		   sapDist.put(query, minDist);
-		   sapAncestor.put(query, ancestor);		   
+		   if (ancestor == -1) {
+			   sapDist.put(query, -1);
+			   sapAncestor.put(query, ancestor);
+			   return;
+		   }
+		   else {
+			   sapDist.put(query, minDist);
+			   sapAncestor.put(query, ancestor);
+		   }
 	   }
 	   private void sap1(int v, int w) {
 		   int minDist = INFINITY;
@@ -171,26 +192,45 @@ public class SAP {
 			   sapAncestor.put(query, -1);
 		   }
 	   }
-	   private void bfs(int s, int[] distTo, int[] pathTo) {
+	   private void bfs(int s, int[] distTo, int[] pathTo) {	   
 		   
-		   marked = new boolean[distTo.length];
 		   Queue<Integer> q = new Queue<Integer>();
-		   marked[s] = true;
+		   marked[s] = s;
 		   distTo[s] = 0;
 		   pathTo[s] = 0;
 		   q.enqueue(s);
 		   while (!q.isEmpty()) {
 			   int v = q.dequeue();
 			   for (int w : G.adj(v)) {
-				   if (!marked[w]) {					   
+				   if (marked[w] != s) {					   
 					   distTo[w] = distTo[v] + 1;
 					   pathTo[w] = v;
-					   marked[w] = true;
+					   marked[w] = s;
+					   
 					   q.enqueue(w);
 				   }
 			   }
 		   }
 	   }
+//	   private void bfs1(int s, int[] distTo, int[] pathTo) {		   
+//		   marked = new boolean[distTo.length];
+//		   Queue<Integer> q = new Queue<Integer>();
+//		   marked[s] = true;
+//		   distTo[s] = 0;
+//		   pathTo[s] = 0;
+//		   q.enqueue(s);
+//		   while (!q.isEmpty()) {
+//			   int v = q.dequeue();
+//			   for (int w : G.adj(v)) {
+//				   if (!marked[w]) {					   
+//					   distTo[w] = distTo[v] + 1;
+//					   pathTo[w] = v;
+//					   marked[w] = true;
+//					   q.enqueue(w);
+//				   }
+//			   }
+//		   }
+//	   }
 	   private Iterable<Integer> pathTo(int v, int[] distTo, int[] edgeTo) {	        
 	        Stack<Integer> path = new Stack<Integer>();
 	        int x;
@@ -211,7 +251,7 @@ public class SAP {
 		   In in = new In("wordnet\\digraph3.txt");
 		   Digraph G = new Digraph(in);		   
 		    SAP sap = new SAP(G);
-		    StdOut.println(sap.ancestor(7, 9));
+		    StdOut.println("length: " + sap.length(6, 2) + " ancestor: "+ sap.ancestor(6, 2));
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
 //		        int w = StdIn.readInt();
