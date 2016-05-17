@@ -98,7 +98,7 @@ public class SAP {
 		   return minDist;
 		   	   
 	   }
-	   public int length1(Iterable<Integer> v, Iterable<Integer> w) {
+	   private int length1(Iterable<Integer> v, Iterable<Integer> w) {
 		   int minDist = INFINITY;
 		   int tmpDist;
 		   if (v == null | w == null) {
@@ -147,7 +147,7 @@ public class SAP {
 		   }
 		   return ancestor;  
 	   }
-	   public int ancestor1(Iterable<Integer> v, Iterable<Integer> w) {
+	   private int ancestor1(Iterable<Integer> v, Iterable<Integer> w) {
 		   int minDist = INFINITY;
 		   int tmpDist;
 		   int ancestor = -1;
