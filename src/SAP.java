@@ -15,6 +15,7 @@ public class SAP {
 	private HashMap<HashSet<Integer>, Integer> sapDist;
 	private HashMap<HashSet<Integer>, Integer> sapAncestor;
 	private int[] distV, distW, pathV, pathW;
+	private HashSet<Integer> markedUnion;
 //	private int[] marked;
 	private boolean[] marked, markedSAP;
 //	private boolean marked[];
@@ -27,7 +28,8 @@ public class SAP {
 		   this.pathW = new int[G.V()];
 //		   this.marked = new int[G.V()];
 		   this.marked = new boolean[G.V()];
-		   this.markedSAP = new boolean[G.V()];
+//		   this.markedSAP = new boolean[G.V()];
+		   this.markedUnion = new HashSet<Integer>();
 		   this.sapDist = new HashMap<HashSet<Integer>, Integer>();
 		   this.sapAncestor = new HashMap<HashSet<Integer>, Integer>();
 		   for (int v = 0; v < G.V(); v++) {
@@ -43,7 +45,8 @@ public class SAP {
 		   if (!sapDist.containsKey(query)) {
 //			   resetDist();		   
 			   bfs(v, distV, pathV);			   			   
-			   bfs(w, distW, pathW);			   
+			   bfs(w, distW, pathW);
+//			   StdOut.println(markedUnion.toString());
 //			   printArray(distV);
 //			   printArray(distW);
 			   sap(v, w);
@@ -70,9 +73,32 @@ public class SAP {
 			   return sapAncestor.get(query);
 		   }
 	   }
+	   
 //
 //	   // length of shortest ancestral path between any vertex in v and any vertex in w; -1 if no such path
 	   public int length(Iterable<Integer> v, Iterable<Integer> w) {
+		   int minDist = INFINITY;
+		   int tmpDist;		   
+		   bfs(v, distV, pathV);			   
+		   bfs(w, distW, pathW);
+		   for (int x : markedUnion) {
+			   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+				   tmpDist = distV[x] + distW[x];
+				   if (tmpDist < minDist) {
+					   minDist = tmpDist;					   
+				   }
+				   else {					   
+					   return minDist;
+				   }
+			   }
+		   }
+		   if (minDist == INFINITY) {
+			   return -1;
+		   }
+		   return minDist;
+		   	   
+	   }
+	   public int length1(Iterable<Integer> v, Iterable<Integer> w) {
 		   int minDist = INFINITY;
 		   int tmpDist;
 		   if (v == null | w == null) {
@@ -103,6 +129,28 @@ public class SAP {
 		   int minDist = INFINITY;
 		   int tmpDist;
 		   int ancestor = -1;
+		   bfs(v, distV, pathV);			   
+		   bfs(w, distW, pathW);
+		   for (int x : markedUnion) {
+			   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+				   tmpDist = distV[x] + distW[x];
+				   if (tmpDist < minDist) {
+					   ancestor = x;					   
+				   }
+				   else {					   
+					   return ancestor;
+				   }
+			   }
+		   }
+		   if (minDist == INFINITY) {
+			   return -1;
+		   }
+		   return ancestor;  
+	   }
+	   public int ancestor1(Iterable<Integer> v, Iterable<Integer> w) {
+		   int minDist = INFINITY;
+		   int tmpDist;
+		   int ancestor = -1;
 		   if (v == null | w == null) {
 			   throw new java.lang.NullPointerException();
 		   }
@@ -130,59 +178,27 @@ public class SAP {
 		   int minDist = INFINITY;		   
 		   int tmpDist;
 		   int ancestor = -1;
-		   int x;
 		   HashSet<Integer> query = new HashSet<Integer>();
 		   query.add(v);
 		   query.add(w);
-		   Queue<Integer> pathFind = new Queue<Integer>();
-		   pathFind.enqueue(v);
-		   pathFind.enqueue(w);
-		   markedSAP[v] = true;
-		   markedSAP[w] = true;
-//		   marked[v] = v;
-//		   marked[w] = w;
-		   //printArray(marked);
-		   if (distV[w] != INFINITY | distW[v] != INFINITY) {
-			   if (distV[w] < distW[v]) {
-				   minDist = distV[w];
-				   ancestor = w;
-			   }
-			   else {
-				   minDist = distW[v];
-				   ancestor = v;
-			   }
-			   sapDist.put(query, minDist);
-			   sapAncestor.put(query, ancestor);
-		   }
-		   while (!pathFind.isEmpty()) {
-			   x = pathFind.dequeue();
-//			   StdOut.println(x);
-//			   printArray(markedSAP);
-			   
-			   for (int x1 : G.adj(x)) {
-				   if (!markedSAP[x1]) {
-					   if (distV[x1] != INFINITY & distW[x1] != INFINITY) {
-							 tmpDist = distV[x1] + distW[x1];
-//							 StdOut.println(x1 + "| distV: " + distV[x1] + ", distW: " + distW[x1] + 
-//									 ", tmpDist: " + tmpDist + 
-//									 ", minDist: " + minDist);
-//							   printArray(markedSAP);
-							 if (tmpDist <= minDist) {
-								 minDist = tmpDist;
-								 ancestor = x1;
-							 }
-							 else {
-							 sapDist.put(query, minDist);
-							   sapAncestor.put(query, ancestor);
-//							   StdOut.println("early escape");
-							   return;
-						 }
-					   }
-					   pathFind.enqueue(x1);
-					   markedSAP[x1] = true;
-				   }				   
+		   for (int x : markedUnion) {
+//			   StdOut.println(x + " distV: " + distV[x] + " distW: " + distW[x]);
+			   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+				   
+				   tmpDist = distV[x] + distW[x];
+//				   StdOut.println(x + " tmpDist: " + tmpDist);
+				   if (tmpDist < minDist) {
+					   minDist = tmpDist;
+					   ancestor = x;
+				   }
+//				   else {
+//					   sapDist.put(query, minDist);
+//					   sapAncestor.put(query, ancestor);
+//					   return;
+//				   }
 			   }
 		   }
+
 		   if (ancestor == -1) {
 			   sapDist.put(query, -1);
 			   sapAncestor.put(query, ancestor);
@@ -242,6 +258,7 @@ public class SAP {
 		   distTo[s] = 0;
 		   pathTo[s] = 0;
 		   q.enqueue(s);
+		   markedUnion.add(s);
 		   while (!q.isEmpty()) {
 			   int v = q.dequeue();
 			   for (int w : G.adj(v)) {
@@ -249,6 +266,32 @@ public class SAP {
 					   distTo[w] = distTo[v] + 1;
 					   pathTo[w] = v;
 					   marked[w] = true;
+					   markedUnion.add(w);
+					   q.enqueue(w);
+				   }
+			   }
+		   }
+	   }
+	   private void bfs(Iterable<Integer> s, int[] distTo, int[] pathTo) {		   
+		   marked = new boolean[distTo.length];
+		   Queue<Integer> q = new Queue<Integer>();
+		   for (Integer s1 : s) {
+			   if (s1 == null) {
+				   throw new java.lang.NullPointerException();
+			   }			   
+			   marked[s1] = true;
+			   distTo[s1] = 0;
+			   pathTo[s1] = 0;
+			   q.enqueue(s1);
+		   }		   
+		   while (!q.isEmpty()) {
+			   int v = q.dequeue();
+			   for (int w : G.adj(v)) {
+				   if (!marked[w]) {					   
+					   distTo[w] = distTo[v] + 1;
+					   pathTo[w] = v;
+					   marked[w] = true;
+					   markedUnion.add(w);
 					   q.enqueue(w);
 				   }
 			   }
@@ -280,7 +323,7 @@ public class SAP {
 		   In in = new In("wordnet\\digraph3.txt");
 		   Digraph G = new Digraph(in);		   
 		    SAP sap = new SAP(G);
-		    StdOut.println("length: " + sap.length(2, 6) + " ancestor: "+ sap.ancestor(2, 6));
+		    StdOut.println("length: " + sap.length(3, 3) + " ancestor: "+ sap.ancestor(3, 3));
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
 //		        int w = StdIn.readInt();
