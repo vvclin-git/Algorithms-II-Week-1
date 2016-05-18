@@ -43,7 +43,7 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapDist.containsKey(query)) {
-//			   resetDist();		   
+			   resetDist();		   
 			   bfs(v, distV, pathV);			   			   
 			   bfs(w, distW, pathW);
 //			   StdOut.println(markedUnion.toString());
@@ -63,7 +63,7 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapAncestor.containsKey(query)) {
-//			   resetDist();		   
+			   resetDist();		   
 			   bfs(v, distV, pathV);			   
 			   bfs(w, distW, pathW);
 			   sap(v, w);
@@ -135,6 +135,7 @@ public class SAP {
 			   if (distV[x] != INFINITY & distW[x] != INFINITY) {
 				   tmpDist = distV[x] + distW[x];
 				   if (tmpDist < minDist) {
+					   minDist = tmpDist;
 					   ancestor = x;					   
 				   }
 				   else {					   
@@ -183,11 +184,10 @@ public class SAP {
 		   query.add(w);
 		   for (int x : markedUnion) {
 //			   StdOut.println(x + " distV: " + distV[x] + " distW: " + distW[x]);
-			   if (distV[x] != INFINITY & distW[x] != INFINITY) {
-				   
+			   if (distV[x] != INFINITY & distW[x] != INFINITY) {				   
 				   tmpDist = distV[x] + distW[x];
 //				   StdOut.println(x + " tmpDist: " + tmpDist);
-				   if (tmpDist < minDist) {
+				   if (tmpDist <= minDist) {
 					   minDist = tmpDist;
 					   ancestor = x;
 				   }
@@ -320,10 +320,10 @@ public class SAP {
 	   // do unit testing of this class
 	   public static void main(String[] args) {
 //		   In in = new In(args[0]);
-		   In in = new In("wordnet\\digraph3.txt");
+		   In in = new In("wordnet\\digraph2.txt");
 		   Digraph G = new Digraph(in);		   
-		    SAP sap = new SAP(G);
-		    StdOut.println("length: " + sap.length(3, 3) + " ancestor: "+ sap.ancestor(3, 3));
+		   SAP sap = new SAP(G);
+		   StdOut.println("length: " + sap.length(4, 0) + " ancestor: "+ sap.ancestor(4, 0));
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
 //		        int w = StdIn.readInt();
