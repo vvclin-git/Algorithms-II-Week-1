@@ -79,17 +79,20 @@ public class SAP {
 	   public int length(Iterable<Integer> v, Iterable<Integer> w) {
 		   int minDist = INFINITY;
 		   int tmpDist;		   
+		   resetDist();
 		   bfs(v, distV, pathV);			   
 		   bfs(w, distW, pathW);
+//		   StdOut.println(markedUnion.toString());
 		   for (int x : markedUnion) {
+//			   StdOut.println(x + " distV: " + distV[x] + " distW: " + distW[x]);
 			   if (distV[x] != INFINITY & distW[x] != INFINITY) {
 				   tmpDist = distV[x] + distW[x];
 				   if (tmpDist < minDist) {
 					   minDist = tmpDist;					   
 				   }
-				   else {					   
-					   return minDist;
-				   }
+//				   else {					   
+//					   return minDist;
+//				   }
 			   }
 		   }
 		   if (minDist == INFINITY) {
@@ -98,37 +101,14 @@ public class SAP {
 		   return minDist;
 		   	   
 	   }
-	   private int length1(Iterable<Integer> v, Iterable<Integer> w) {
-		   int minDist = INFINITY;
-		   int tmpDist;
-		   if (v == null | w == null) {
-			   throw new java.lang.NullPointerException();
-		   }
-		   for (Integer v1 : v) {
-			   for (Integer w1 : w) {
-				   if (v1 == null | w1 == null) {
-					   throw new java.lang.NullPointerException();
-				   }
-				   tmpDist = length(v1, w1);
-				   if (tmpDist < minDist & tmpDist > 0) {
-					   minDist = tmpDist;
-				   }
-			   }
-		   }
-		   if (minDist != INFINITY) {
-			   return minDist;
-		   }
-		   else {
-			   return -1;
-			   
-		   }		   
-	   }
+	   
 //
 //	   // a common ancestor that participates in shortest ancestral path; -1 if no such path
 	   public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
 		   int minDist = INFINITY;
 		   int tmpDist;
 		   int ancestor = -1;
+		   resetDist();
 		   bfs(v, distV, pathV);			   
 		   bfs(w, distW, pathW);
 		   for (int x : markedUnion) {
@@ -138,9 +118,9 @@ public class SAP {
 					   minDist = tmpDist;
 					   ancestor = x;					   
 				   }
-				   else {					   
-					   return ancestor;
-				   }
+//				   else {					   
+//					   return ancestor;
+//				   }
 			   }
 		   }
 		   if (minDist == INFINITY) {
@@ -148,27 +128,7 @@ public class SAP {
 		   }
 		   return ancestor;  
 	   }
-	   private int ancestor1(Iterable<Integer> v, Iterable<Integer> w) {
-		   int minDist = INFINITY;
-		   int tmpDist;
-		   int ancestor = -1;
-		   if (v == null | w == null) {
-			   throw new java.lang.NullPointerException();
-		   }
-		   for (Integer v1 : v) {
-			   for (Integer w1 : w) {
-				   if (v1 == null | w1 == null) {
-					   throw new java.lang.NullPointerException();
-				   }
-				   tmpDist = length(v1, w1);
-				   if (tmpDist < minDist & tmpDist > 0) {
-					   minDist = tmpDist;
-					   ancestor = ancestor(v1, w1);
-				   }
-			   }
-		   }
-		   return ancestor;	   
-	   }
+	   
 	   private void resetDist() {
 		   for (int v = 0; v < G.V(); v++) {
 			   distV[v] = INFINITY;
@@ -209,48 +169,7 @@ public class SAP {
 			   sapAncestor.put(query, ancestor);
 		   }
 	   }
-	   private void sap1(int v, int w) {
-		   int minDist = INFINITY;
-		   int tmpDist;
-		   int ancestor = -1;
-		   HashSet<Integer> query = new HashSet<Integer>();
-		   query.add(v);
-		   query.add(w);		   
-		   for (int i = 0; i < G.V(); i++) {
-			   tmpDist = distV[i] + distW[i];			   
-			   if (tmpDist < minDist & tmpDist >= 0) {
-				   minDist = tmpDist;
-				   ancestor = i;
-			   }
-		   }
-		   if (ancestor != -1) {
-			   sapDist.put(query, minDist);
-			   sapAncestor.put(query, ancestor);
-		   }
-		   else {
-			   sapDist.put(query, -1);
-			   sapAncestor.put(query, -1);
-		   }
-	   }
-//	   private void bfs1(int s, int[] distTo, int[] pathTo) {		   
-//		   Queue<Integer> q = new Queue<Integer>();
-//		   marked[s] = s;
-//		   distTo[s] = 0;
-//		   pathTo[s] = 0;
-//		   q.enqueue(s);
-//		   while (!q.isEmpty()) {
-//			   int v = q.dequeue();
-//			   for (int w : G.adj(v)) {
-//				   if (marked[w] != s) {					   
-//					   distTo[w] = distTo[v] + 1;
-//					   pathTo[w] = v;
-//					   marked[w] = s;
-//					   
-//					   q.enqueue(w);
-//				   }
-//			   }
-//		   }
-//	   }
+	   
 	   private void bfs(int s, int[] distTo, int[] pathTo) {		   
 		   marked = new boolean[distTo.length];
 		   Queue<Integer> q = new Queue<Integer>();
@@ -279,6 +198,7 @@ public class SAP {
 			   if (s1 == null) {
 				   throw new java.lang.NullPointerException();
 			   }			   
+			   markedUnion.add(s1);
 			   marked[s1] = true;
 			   distTo[s1] = 0;
 			   pathTo[s1] = 0;
@@ -331,15 +251,15 @@ public class SAP {
 //		        int ancestor = sap.ancestor(v, w);
 //		        StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
 //		    }
-//		    Bag<Integer> v = new Bag<Integer>();
-//		    Bag<Integer> w = new Bag<Integer>();
-//		    v.add(7);
-//		    v.add(8);
-//		    w.add(4);
-//		    w.add(9);
-//		    w.add(11);
-//	        int length   = sap.length(v, w);
-//	        int ancestor = sap.ancestor(v, w);
-//		    StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
+		    Bag<Integer> v = new Bag<Integer>();
+		    Bag<Integer> w = new Bag<Integer>();
+		    v.add(1);
+		    v.add(2);
+		    w.add(2);
+		    w.add(3);
+		    w.add(4);
+	        int length   = sap.length(v, w);	        
+	        int ancestor = sap.ancestor(v, w);
+		    StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
 	   }
 }
