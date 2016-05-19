@@ -14,6 +14,8 @@ public class SAP {
 	private Digraph G;	
 	private HashMap<HashSet<Integer>, Integer> sapDist;
 	private HashMap<HashSet<Integer>, Integer> sapAncestor;
+	private ArrayList<Bag<Integer>> markedV;
+	private ArrayList<Bag<Integer>> markedW;
 	private int[] distV, distW, pathV, pathW;
 	private HashSet<Integer> markedUnion;
 //	private int[] marked;
@@ -30,6 +32,8 @@ public class SAP {
 		   this.marked = new boolean[G.V()];
 //		   this.markedSAP = new boolean[G.V()];
 		   this.markedUnion = new HashSet<Integer>();
+		   this.markedV = new ArrayList<Bag<Integer>>();
+		   this.markedW = new ArrayList<Bag<Integer>>();
 		   this.sapDist = new HashMap<HashSet<Integer>, Integer>();
 		   this.sapAncestor = new HashMap<HashSet<Integer>, Integer>();
 		   for (int v = 0; v < G.V(); v++) {
@@ -43,9 +47,13 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapDist.containsKey(query)) {
-			   resetDist();		   
-			   bfs(v, distV, pathV);			   			   
-			   bfs(w, distW, pathW);
+			   resetDist();
+			   markedV = new ArrayList<Bag<Integer>>();
+			   markedW = new ArrayList<Bag<Integer>>();
+//			   bfs(v, distV, pathV);			   			   
+//			   bfs(w, distW, pathW);
+			   bfs(v, distV, markedV);			   			   
+			   bfs(w, distW, markedW);
 //			   StdOut.println(markedUnion.toString());
 //			   printArray(distV);
 //			   printArray(distW);
@@ -63,10 +71,14 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapAncestor.containsKey(query)) {
-			   resetDist();		   
-			   bfs(v, distV, pathV);			   
-			   bfs(w, distW, pathW);
-			   sap(v, w);
+			   resetDist();	
+			   markedV = new ArrayList<Bag<Integer>>();
+			   markedW = new ArrayList<Bag<Integer>>();
+//			   bfs(v, distV, pathV);			   
+//			   bfs(w, distW, pathW);
+			   bfs(v, distV, markedV);			   			   
+			   bfs(w, distW, markedW);			   
+			   sap(v, w);			   
 			   return sapAncestor.get(query);
 		   }
 		   else {
@@ -142,6 +154,72 @@ public class SAP {
 		   HashSet<Integer> query = new HashSet<Integer>();
 		   query.add(v);
 		   query.add(w);
+		   searchV: {
+			   for (Bag<Integer> b : markedV) {
+				   for (int x : b) {
+					   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+						   tmpDist = distV[x] + distW[x];
+//						   StdOut.println(x + " tmpDist: " + tmpDist);
+						   if (tmpDist == 0) {
+							   minDist = tmpDist;
+							   ancestor = x;
+							   sapDist.put(query, minDist);
+							   sapAncestor.put(query, ancestor);
+							   return;						   
+						   }
+						   if (tmpDist <= minDist) {
+							   minDist = tmpDist;
+							   ancestor = x;
+						   }
+						   else {
+							   break searchV;
+						   }
+					   }				   
+				   }
+			   }
+		   }
+		   searchW: {
+			   for (Bag<Integer> b : markedW) {
+				   for (int x : b) {
+					   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+						   tmpDist = distV[x] + distW[x];
+//						   StdOut.println(x + " tmpDist: " + tmpDist);
+						   if (tmpDist == 0) {
+							   minDist = tmpDist;
+							   ancestor = x;
+							   sapDist.put(query, minDist);
+							   sapAncestor.put(query, ancestor);
+							   return;						   
+						   }
+						   if (tmpDist <= minDist) {
+							   minDist = tmpDist;
+							   ancestor = x;
+						   }
+						   else {
+							   break searchW;
+						   }
+					   }				   
+				   }
+			   }
+		   }		   
+
+		   if (ancestor == -1) {
+			   sapDist.put(query, -1);
+			   sapAncestor.put(query, ancestor);
+			   return;
+		   }
+		   else {
+			   sapDist.put(query, minDist);
+			   sapAncestor.put(query, ancestor);
+		   }
+	   }
+	   private void sap1(int v, int w) {
+		   int minDist = INFINITY;		   
+		   int tmpDist;
+		   int ancestor = -1;
+		   HashSet<Integer> query = new HashSet<Integer>();
+		   query.add(v);
+		   query.add(w);
 		   for (int x : markedUnion) {
 //			   StdOut.println(x + " distV: " + distV[x] + " distW: " + distW[x]);
 			   if (distV[x] != INFINITY & distW[x] != INFINITY) {				   
@@ -177,13 +255,36 @@ public class SAP {
 		   distTo[s] = 0;
 		   pathTo[s] = 0;
 		   q.enqueue(s);
-		   markedUnion.add(s);
+		   markedUnion.add(s);		   
 		   while (!q.isEmpty()) {
 			   int v = q.dequeue();
 			   for (int w : G.adj(v)) {
 				   if (!marked[w]) {					   
 					   distTo[w] = distTo[v] + 1;
 					   pathTo[w] = v;
+					   marked[w] = true;
+					   markedUnion.add(w);
+					   q.enqueue(w);
+				   }
+			   }
+		   }
+	   }
+	   private void bfs(int s, int[] distTo, ArrayList<Bag<Integer>> markedS) {		   
+		   marked = new boolean[distTo.length];
+		   Queue<Integer> q = new Queue<Integer>();
+		   marked[s] = true;
+		   distTo[s] = 0;
+		   markedS.add(new Bag<Integer>());
+		   markedS.get(0).add(s);
+		   q.enqueue(s);
+		   markedUnion.add(s);		   
+		   while (!q.isEmpty()) {
+			   int v = q.dequeue();
+			   markedS.add(new Bag<Integer>());
+			   for (int w : G.adj(v)) {
+				   if (!marked[w]) {					   
+					   distTo[w] = distTo[v] + 1;
+					   markedS.get(distTo[w]).add(w);
 					   marked[w] = true;
 					   markedUnion.add(w);
 					   q.enqueue(w);
@@ -240,10 +341,10 @@ public class SAP {
 	   // do unit testing of this class
 	   public static void main(String[] args) {
 //		   In in = new In(args[0]);
-		   In in = new In("wordnet\\digraph2.txt");
+		   In in = new In("wordnet\\digraph1.txt");
 		   Digraph G = new Digraph(in);		   
 		   SAP sap = new SAP(G);
-		   StdOut.println("length: " + sap.length(4, 0) + " ancestor: "+ sap.ancestor(4, 0));
+		   StdOut.println("length: " + sap.length(11, 12) + " ancestor: "+ sap.ancestor(11, 12));
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
 //		        int w = StdIn.readInt();
