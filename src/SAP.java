@@ -18,8 +18,8 @@ public class SAP {
 	private ArrayList<Bag<Integer>> markedW;
 	private int[] distV, distW, pathV, pathW;
 	private HashSet<Integer> markedUnion;
-//	private int[] marked;
-	private boolean[] marked, markedSAP;
+	private int[] marked;
+//	private boolean[] marked, markedSAP;
 //	private boolean marked[];
 	   // constructor takes a digraph (not necessarily a DAG)
 	   public SAP(Digraph G) {
@@ -28,8 +28,8 @@ public class SAP {
 		   this.distW = new int[G.V()];
 		   this.pathV = new int[G.V()];
 		   this.pathW = new int[G.V()];
-//		   this.marked = new int[G.V()];
-		   this.marked = new boolean[G.V()];
+		   this.marked = new int[G.V()];
+//		   this.marked = new boolean[G.V()];
 //		   this.markedSAP = new boolean[G.V()];
 		   this.markedUnion = new HashSet<Integer>();
 		   this.markedV = new ArrayList<Bag<Integer>>();
@@ -47,7 +47,7 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapDist.containsKey(query)) {
-			   resetDist();
+//			   resetDist();
 			   markedV = new ArrayList<Bag<Integer>>();
 			   markedW = new ArrayList<Bag<Integer>>();
 //			   bfs(v, distV, pathV);			   			   
@@ -71,7 +71,7 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapAncestor.containsKey(query)) {
-			   resetDist();	
+//			   resetDist();	
 			   markedV = new ArrayList<Bag<Integer>>();
 			   markedW = new ArrayList<Bag<Integer>>();
 //			   bfs(v, distV, pathV);			   
@@ -249,9 +249,10 @@ public class SAP {
 	   }
 	   
 	   private void bfs(int s, int[] distTo, int[] pathTo) {		   
-		   marked = new boolean[distTo.length];
+//		   marked = new boolean[distTo.length];
 		   Queue<Integer> q = new Queue<Integer>();
-		   marked[s] = true;
+//		   marked[s] = true;
+		   marked[s] = s;
 		   distTo[s] = 0;
 		   pathTo[s] = 0;
 		   q.enqueue(s);
@@ -259,10 +260,12 @@ public class SAP {
 		   while (!q.isEmpty()) {
 			   int v = q.dequeue();
 			   for (int w : G.adj(v)) {
-				   if (!marked[w]) {					   
+//				   if (!marked[w]) {
+				   if (marked[w] != s) {
 					   distTo[w] = distTo[v] + 1;
 					   pathTo[w] = v;
-					   marked[w] = true;
+//					   marked[w] = true;
+					   marked[w] = s;
 					   markedUnion.add(w);
 					   q.enqueue(w);
 				   }
@@ -270,9 +273,10 @@ public class SAP {
 		   }
 	   }
 	   private void bfs(int s, int[] distTo, ArrayList<Bag<Integer>> markedS) {		   
-		   marked = new boolean[distTo.length];
+//		   marked = new boolean[distTo.length];
 		   Queue<Integer> q = new Queue<Integer>();
-		   marked[s] = true;
+//		   marked[s] = true;
+		   marked[s] = s;
 		   distTo[s] = 0;
 		   markedS.add(new Bag<Integer>());
 		   markedS.get(0).add(s);
@@ -282,10 +286,12 @@ public class SAP {
 			   int v = q.dequeue();
 			   markedS.add(new Bag<Integer>());
 			   for (int w : G.adj(v)) {
-				   if (!marked[w]) {					   
+//				   if (!marked[w]) {
+				   if (marked[w] != s) {
 					   distTo[w] = distTo[v] + 1;
 					   markedS.get(distTo[w]).add(w);
-					   marked[w] = true;
+//					   marked[w] = true;
+					   marked[w] = s;
 					   markedUnion.add(w);
 					   q.enqueue(w);
 				   }
@@ -293,7 +299,7 @@ public class SAP {
 		   }
 	   }
 	   private void bfs(Iterable<Integer> s, int[] distTo, int[] pathTo) {		   
-		   marked = new boolean[distTo.length];
+		   boolean[] marked = new boolean[distTo.length];
 		   Queue<Integer> q = new Queue<Integer>();
 		   for (Integer s1 : s) {
 			   if (s1 == null) {
@@ -301,6 +307,7 @@ public class SAP {
 			   }			   
 			   markedUnion.add(s1);
 			   marked[s1] = true;
+//			   marked[s1] = s1;
 			   distTo[s1] = 0;
 			   pathTo[s1] = 0;
 			   q.enqueue(s1);
@@ -308,10 +315,12 @@ public class SAP {
 		   while (!q.isEmpty()) {
 			   int v = q.dequeue();
 			   for (int w : G.adj(v)) {
-				   if (!marked[w]) {					   
+				   if (!marked[w]) {
+//				   if (marked[w] != marked[v]) {
 					   distTo[w] = distTo[v] + 1;
 					   pathTo[w] = v;
 					   marked[w] = true;
+//					   marked[w] = marked[v];
 					   markedUnion.add(w);
 					   q.enqueue(w);
 				   }
