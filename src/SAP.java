@@ -14,32 +14,21 @@ public class SAP {
 	private Digraph G;	
 	private HashMap<HashSet<Integer>, Integer> sapDist;
 	private HashMap<HashSet<Integer>, Integer> sapAncestor;
+	private HashMap<Integer, Integer> distV, distW;
 	private ArrayList<Bag<Integer>> markedV;
 	private ArrayList<Bag<Integer>> markedW;
-	private int[] distV, distW, pathV, pathW;
-	private HashSet<Integer> markedUnion;
-	private int[] marked;
-//	private boolean[] marked, markedSAP;
-//	private boolean marked[];
+	private HashSet<Integer> marked;
+
 	   // constructor takes a digraph (not necessarily a DAG)
 	   public SAP(Digraph G) {
 		   this.G = G;
-		   this.distV = new int[G.V()];
-		   this.distW = new int[G.V()];
-		   this.pathV = new int[G.V()];
-		   this.pathW = new int[G.V()];
-		   this.marked = new int[G.V()];
-//		   this.marked = new boolean[G.V()];
-//		   this.markedSAP = new boolean[G.V()];
-		   this.markedUnion = new HashSet<Integer>();
+		   this.distV = new HashMap<Integer, Integer>();
+		   this.distW = new HashMap<Integer, Integer>();
+		   this.marked = new HashSet<Integer>();		   
 		   this.markedV = new ArrayList<Bag<Integer>>();
 		   this.markedW = new ArrayList<Bag<Integer>>();
 		   this.sapDist = new HashMap<HashSet<Integer>, Integer>();
 		   this.sapAncestor = new HashMap<HashSet<Integer>, Integer>();
-		   for (int v = 0; v < G.V(); v++) {
-			   this.distV[v] = INFINITY;
-			   this.distW[v] = INFINITY;
-		   }
 	   }	   
 	   //length of shortest ancestral path between v and w; -1 if no such path
 	   public int length(int v, int w) {		   
@@ -47,17 +36,14 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapDist.containsKey(query)) {
-//			   resetDist();
 			   markedV = new ArrayList<Bag<Integer>>();
 			   markedW = new ArrayList<Bag<Integer>>();
-//			   bfs(v, distV, pathV);			   			   
-//			   bfs(w, distW, pathW);
 			   bfs(v, distV, markedV);			   			   
 			   bfs(w, distW, markedW);
 //			   StdOut.println(markedUnion.toString());
-//			   printArray(distV);
-//			   printArray(distW);
-			   sap(v, w);
+			   FindSAP findSAP = new FindSAP();
+			   sapDist.put(query, findSAP.getSAPDist());
+			   sapAncestor.put(query, findSAP.getSAPAncestor());
 			   return sapDist.get(query);
 		   }
 		   else {
@@ -71,14 +57,13 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapAncestor.containsKey(query)) {
-//			   resetDist();	
 			   markedV = new ArrayList<Bag<Integer>>();
 			   markedW = new ArrayList<Bag<Integer>>();
-//			   bfs(v, distV, pathV);			   
-//			   bfs(w, distW, pathW);
 			   bfs(v, distV, markedV);			   			   
-			   bfs(w, distW, markedW);			   
-			   sap(v, w);			   
+			   bfs(w, distW, markedW);
+			   FindSAP findSAP = new FindSAP();
+			   sapDist.put(query, findSAP.getSAPDist());
+			   sapAncestor.put(query, findSAP.getSAPAncestor());
 			   return sapAncestor.get(query);
 		   }
 		   else {
@@ -89,62 +74,92 @@ public class SAP {
 //
 //	   // length of shortest ancestral path between any vertex in v and any vertex in w; -1 if no such path
 	   public int length(Iterable<Integer> v, Iterable<Integer> w) {
-		   int minDist = INFINITY;
-		   int tmpDist;		   
-		   resetDist();
-		   bfs(v, distV, pathV);			   
-		   bfs(w, distW, pathW);
-//		   StdOut.println(markedUnion.toString());
-		   for (int x : markedUnion) {
-//			   StdOut.println(x + " distV: " + distV[x] + " distW: " + distW[x]);
-			   if (distV[x] != INFINITY & distW[x] != INFINITY) {
-				   tmpDist = distV[x] + distW[x];
-				   if (tmpDist < minDist) {
-					   minDist = tmpDist;					   
-				   }
-//				   else {					   
-//					   return minDist;
-//				   }
-			   }
-		   }
-		   if (minDist == INFINITY) {
-			   return -1;
-		   }
-		   return minDist;
+		   bfs(v, distV, markedV);			   			   
+		   bfs(w, distW, markedW);
+		   FindSAP findSAP = new FindSAP();
+		   return findSAP.getSAPDist();
 		   	   
 	   }
 	   
 //
 //	   // a common ancestor that participates in shortest ancestral path; -1 if no such path
 	   public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
-		   int minDist = INFINITY;
-		   int tmpDist;
-		   int ancestor = -1;
-		   resetDist();
-		   bfs(v, distV, pathV);			   
-		   bfs(w, distW, pathW);
-		   for (int x : markedUnion) {
-			   if (distV[x] != INFINITY & distW[x] != INFINITY) {
-				   tmpDist = distV[x] + distW[x];
-				   if (tmpDist < minDist) {
-					   minDist = tmpDist;
-					   ancestor = x;					   
-				   }
-//				   else {					   
-//					   return ancestor;
-//				   }
-			   }
-		   }
-		   if (minDist == INFINITY) {
-			   return -1;
-		   }
-		   return ancestor;  
+		   bfs(v, distV, markedV);			   			   
+		   bfs(w, distW, markedW);
+		   FindSAP findSAP = new FindSAP();
+		   return findSAP.getSAPAncestor();
 	   }
 	   
-	   private void resetDist() {
-		   for (int v = 0; v < G.V(); v++) {
-			   distV[v] = INFINITY;
-			   distW[v] = INFINITY;
+
+	   private class FindSAP {
+		   int minDist = INFINITY;		   
+		   int tmpDist;
+		   int ancestor = -1;
+		   public FindSAP() {			   
+			   searchV: {
+				   for (Bag<Integer> b : markedV) {
+					   for (int x : b) {
+//						   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+						   if (distV.containsKey(x) & distW.containsKey(x)) {
+//							   tmpDist = distV[x] + distW[x];
+							   tmpDist = distV.get(x) + distW.get(x);
+//							   StdOut.println(x + " tmpDist: " + tmpDist);
+							   if (tmpDist == 0) {
+								   minDist = tmpDist;
+								   ancestor = x;								   
+								   return;						   
+							   }
+							   if (tmpDist <= minDist) {
+								   minDist = tmpDist;
+								   ancestor = x;
+							   }
+//							   else {
+//								   break searchV;
+//							   }
+						   }				   
+					   }
+				   }
+			   }
+			   searchW: {
+				   for (Bag<Integer> b : markedW) {
+					   for (int x : b) {
+//						   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+						if (distV.containsKey(x) & distW.containsKey(x)) {
+//							   tmpDist = distV[x] + distW[x];
+							tmpDist = distV.get(x) + distW.get(x);
+//							   StdOut.println(x + " tmpDist: " + tmpDist);
+							   if (tmpDist == 0) {
+								   minDist = tmpDist;
+								   ancestor = x;								   
+								   return;						   
+							   }
+							   if (tmpDist <= minDist) {
+								   minDist = tmpDist;
+								   ancestor = x;
+							   }
+//							   else {
+//								   break searchW;
+//							   }
+						   }				   
+					   }
+				   }
+			   }
+		   }
+		   public int getSAPDist() {
+			   if (minDist != INFINITY) {
+				   return minDist;
+			   }
+			   else {
+				   return -1;
+			   }
+		   }
+		   public int getSAPAncestor() {
+			   if (minDist != INFINITY) {
+				   return ancestor;
+			   }
+			   else {
+				   return -1;
+			   }
 		   }
 	   }
 	   private void sap(int v, int w) {
@@ -157,8 +172,10 @@ public class SAP {
 		   searchV: {
 			   for (Bag<Integer> b : markedV) {
 				   for (int x : b) {
-					   if (distV[x] != INFINITY & distW[x] != INFINITY) {
-						   tmpDist = distV[x] + distW[x];
+//					   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+					   if (distV.containsKey(x) & distW.containsKey(x)) {
+//						   tmpDist = distV[x] + distW[x];
+						   tmpDist = distV.get(x) + distW.get(x);
 //						   StdOut.println(x + " tmpDist: " + tmpDist);
 						   if (tmpDist == 0) {
 							   minDist = tmpDist;
@@ -171,9 +188,9 @@ public class SAP {
 							   minDist = tmpDist;
 							   ancestor = x;
 						   }
-						   else {
-							   break searchV;
-						   }
+//						   else {
+//							   break searchV;
+//						   }
 					   }				   
 				   }
 			   }
@@ -181,8 +198,10 @@ public class SAP {
 		   searchW: {
 			   for (Bag<Integer> b : markedW) {
 				   for (int x : b) {
-					   if (distV[x] != INFINITY & distW[x] != INFINITY) {
-						   tmpDist = distV[x] + distW[x];
+//					   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+					if (distV.containsKey(x) & distW.containsKey(x)) {
+//						   tmpDist = distV[x] + distW[x];
+						tmpDist = distV.get(x) + distW.get(x);
 //						   StdOut.println(x + " tmpDist: " + tmpDist);
 						   if (tmpDist == 0) {
 							   minDist = tmpDist;
@@ -195,9 +214,9 @@ public class SAP {
 							   minDist = tmpDist;
 							   ancestor = x;
 						   }
-						   else {
-							   break searchW;
-						   }
+//						   else {
+//							   break searchW;
+//						   }
 					   }				   
 				   }
 			   }
@@ -212,116 +231,60 @@ public class SAP {
 			   sapDist.put(query, minDist);
 			   sapAncestor.put(query, ancestor);
 		   }
-	   }
-	   private void sap1(int v, int w) {
-		   int minDist = INFINITY;		   
-		   int tmpDist;
-		   int ancestor = -1;
-		   HashSet<Integer> query = new HashSet<Integer>();
-		   query.add(v);
-		   query.add(w);
-		   for (int x : markedUnion) {
-//			   StdOut.println(x + " distV: " + distV[x] + " distW: " + distW[x]);
-			   if (distV[x] != INFINITY & distW[x] != INFINITY) {				   
-				   tmpDist = distV[x] + distW[x];
-//				   StdOut.println(x + " tmpDist: " + tmpDist);
-				   if (tmpDist <= minDist) {
-					   minDist = tmpDist;
-					   ancestor = x;
-				   }
-//				   else {
-//					   sapDist.put(query, minDist);
-//					   sapAncestor.put(query, ancestor);
-//					   return;
-//				   }
-			   }
-		   }
-
-		   if (ancestor == -1) {
-			   sapDist.put(query, -1);
-			   sapAncestor.put(query, ancestor);
-			   return;
-		   }
-		   else {
-			   sapDist.put(query, minDist);
-			   sapAncestor.put(query, ancestor);
-		   }
-	   }
+	   }	   
 	   
-	   private void bfs(int s, int[] distTo, int[] pathTo) {		   
-//		   marked = new boolean[distTo.length];
+	   
+	   private void bfs(int s, HashMap<Integer, Integer> distTo, ArrayList<Bag<Integer>> markedS) {		   
+
+		   marked.clear();
+		   distTo.clear();
 		   Queue<Integer> q = new Queue<Integer>();
-//		   marked[s] = true;
-		   marked[s] = s;
-		   distTo[s] = 0;
-		   pathTo[s] = 0;
-		   q.enqueue(s);
-		   markedUnion.add(s);		   
-		   while (!q.isEmpty()) {
-			   int v = q.dequeue();
-			   for (int w : G.adj(v)) {
-//				   if (!marked[w]) {
-				   if (marked[w] != s) {
-					   distTo[w] = distTo[v] + 1;
-					   pathTo[w] = v;
-//					   marked[w] = true;
-					   marked[w] = s;
-					   markedUnion.add(w);
-					   q.enqueue(w);
-				   }
-			   }
-		   }
-	   }
-	   private void bfs(int s, int[] distTo, ArrayList<Bag<Integer>> markedS) {		   
-//		   marked = new boolean[distTo.length];
-		   Queue<Integer> q = new Queue<Integer>();
-//		   marked[s] = true;
-		   marked[s] = s;
-		   distTo[s] = 0;
+		   marked.add(s);
+		   distTo.put(s, 0);
 		   markedS.add(new Bag<Integer>());
 		   markedS.get(0).add(s);
-		   q.enqueue(s);
-		   markedUnion.add(s);		   
+		   q.enqueue(s);		   		   
 		   while (!q.isEmpty()) {
 			   int v = q.dequeue();
-			   markedS.add(new Bag<Integer>());
+			   if (G.outdegree(v) > 0) {
+				   markedS.add(new Bag<Integer>());
+			   }			   
 			   for (int w : G.adj(v)) {
-//				   if (!marked[w]) {
-				   if (marked[w] != s) {
-					   distTo[w] = distTo[v] + 1;
-					   markedS.get(distTo[w]).add(w);
-//					   marked[w] = true;
-					   marked[w] = s;
-					   markedUnion.add(w);
+				   if (!marked.contains(w)) {
+					   distTo.put(w, distTo.get(v) + 1);
+					   markedS.get(distTo.get(w)).add(w);
+					   marked.add(w);
 					   q.enqueue(w);
 				   }
 			   }
 		   }
 	   }
-	   private void bfs(Iterable<Integer> s, int[] distTo, int[] pathTo) {		   
-		   boolean[] marked = new boolean[distTo.length];
+	   private void bfs(Iterable<Integer> s, HashMap<Integer, Integer> distTo, ArrayList<Bag<Integer>> markedS) {		   
+
+		   marked.clear();
+		   distTo.clear();
 		   Queue<Integer> q = new Queue<Integer>();
+		   markedS.add(new Bag<Integer>());
 		   for (Integer s1 : s) {
 			   if (s1 == null) {
 				   throw new java.lang.NullPointerException();
 			   }			   
-			   markedUnion.add(s1);
-			   marked[s1] = true;
-//			   marked[s1] = s1;
-			   distTo[s1] = 0;
-			   pathTo[s1] = 0;
+			   
+			   marked.add(s1);
+			   distTo.put(s1,  0);			   
+			   markedS.get(0).add(s1);
 			   q.enqueue(s1);
 		   }		   
 		   while (!q.isEmpty()) {
 			   int v = q.dequeue();
+			   if (G.outdegree(v) > 0) {
+				   markedS.add(new Bag<Integer>());
+			   }			   
 			   for (int w : G.adj(v)) {
-				   if (!marked[w]) {
-//				   if (marked[w] != marked[v]) {
-					   distTo[w] = distTo[v] + 1;
-					   pathTo[w] = v;
-					   marked[w] = true;
-//					   marked[w] = marked[v];
-					   markedUnion.add(w);
+				   if (!marked.contains(w)) {
+					   distTo.put(w, distTo.get(v) + 1);
+					   markedS.get(distTo.get(w)).add(w);
+					   marked.add(w);					   
 					   q.enqueue(w);
 				   }
 			   }
