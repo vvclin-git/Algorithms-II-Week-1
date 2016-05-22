@@ -32,16 +32,18 @@ public class SAP {
 	   }	   
 	   //length of shortest ancestral path between v and w; -1 if no such path
 	   public int length(int v, int w) {		   
+//		   long startTime = System.nanoTime();
 		   HashSet<Integer> query = new HashSet<Integer>();
 		   query.add(v);
 		   query.add(w);
 		   if (!sapDist.containsKey(query)) {
-			   markedV = new ArrayList<Bag<Integer>>();
-			   markedW = new ArrayList<Bag<Integer>>();
+			   markedV.clear();
+			   markedW.clear();
 			   bfs(v, distV, markedV);			   			   
 			   bfs(w, distW, markedW);
 //			   StdOut.println(markedUnion.toString());
 			   FindSAP findSAP = new FindSAP();
+//			   StdOut.println("time elapsed in single length: " + (System.nanoTime() - startTime));
 			   sapDist.put(query, findSAP.getSAPDist());
 			   sapAncestor.put(query, findSAP.getSAPAncestor());
 			   return sapDist.get(query);
@@ -57,8 +59,8 @@ public class SAP {
 		   query.add(v);
 		   query.add(w);
 		   if (!sapAncestor.containsKey(query)) {
-			   markedV = new ArrayList<Bag<Integer>>();
-			   markedW = new ArrayList<Bag<Integer>>();
+			   markedV.clear();
+			   markedW.clear();
 			   bfs(v, distV, markedV);			   			   
 			   bfs(w, distW, markedW);
 			   FindSAP findSAP = new FindSAP();
@@ -74,9 +76,13 @@ public class SAP {
 //
 //	   // length of shortest ancestral path between any vertex in v and any vertex in w; -1 if no such path
 	   public int length(Iterable<Integer> v, Iterable<Integer> w) {
+//		   long startTime = System.nanoTime();
+		   markedV.clear();
+		   markedW.clear();
 		   bfs(v, distV, markedV);			   			   
 		   bfs(w, distW, markedW);
 		   FindSAP findSAP = new FindSAP();
+//		   StdOut.println("time elapsed in multiple length: " + (System.nanoTime() - startTime));
 		   return findSAP.getSAPDist();
 		   	   
 	   }
@@ -84,6 +90,8 @@ public class SAP {
 //
 //	   // a common ancestor that participates in shortest ancestral path; -1 if no such path
 	   public int ancestor(Iterable<Integer> v, Iterable<Integer> w) {
+		   markedV.clear();
+		   markedW.clear();
 		   bfs(v, distV, markedV);			   			   
 		   bfs(w, distW, markedW);
 		   FindSAP findSAP = new FindSAP();
@@ -92,18 +100,21 @@ public class SAP {
 	   
 
 	   private class FindSAP {
+//		   long startTime = System.nanoTime();
 		   int minDist = INFINITY;		   
+		   int lvlMinDist = INFINITY;
+		   int prevLvlMinDist = 0;
 		   int tmpDist;
 		   int ancestor = -1;
-		   public FindSAP() {			   
+
+		   public FindSAP() {
 			   searchV: {
 				   for (Bag<Integer> b : markedV) {
+					   lvlMinDist = INFINITY;
 					   for (int x : b) {
-//						   if (distV[x] != INFINITY & distW[x] != INFINITY) {
 						   if (distV.containsKey(x) & distW.containsKey(x)) {
-//							   tmpDist = distV[x] + distW[x];
 							   tmpDist = distV.get(x) + distW.get(x);
-//							   StdOut.println(x + " tmpDist: " + tmpDist);
+//							   StdOut.println("x: " + x + ", tmpDist: " + tmpDist);
 							   if (tmpDist == 0) {
 								   minDist = tmpDist;
 								   ancestor = x;								   
@@ -113,21 +124,21 @@ public class SAP {
 								   minDist = tmpDist;
 								   ancestor = x;
 							   }
+							   
 //							   else {
 //								   break searchV;
 //							   }
 						   }				   
-					   }
+					   }					   
 				   }
 			   }
 			   searchW: {
 				   for (Bag<Integer> b : markedW) {
-					   for (int x : b) {
-//						   if (distV[x] != INFINITY & distW[x] != INFINITY) {
+					   lvlMinDist = INFINITY;					   
+					   for (int x : b) {						   
 						if (distV.containsKey(x) & distW.containsKey(x)) {
-//							   tmpDist = distV[x] + distW[x];
 							tmpDist = distV.get(x) + distW.get(x);
-//							   StdOut.println(x + " tmpDist: " + tmpDist);
+//							StdOut.println("x: " + x + ", tmpDist: " + tmpDist);
 							   if (tmpDist == 0) {
 								   minDist = tmpDist;
 								   ancestor = x;								   
@@ -137,13 +148,15 @@ public class SAP {
 								   minDist = tmpDist;
 								   ancestor = x;
 							   }
+							   
 //							   else {
 //								   break searchW;
 //							   }
 						   }				   
-					   }
+					   }					   
 				   }
 			   }
+//			   StdOut.println("time elapsed in FindSAP: " + (System.nanoTime() - startTime));
 		   }
 		   public int getSAPDist() {
 			   if (minDist != INFINITY) {
@@ -235,7 +248,7 @@ public class SAP {
 	   
 	   
 	   private void bfs(int s, HashMap<Integer, Integer> distTo, ArrayList<Bag<Integer>> markedS) {		   
-
+//		   long startTime = System.nanoTime();
 		   marked.clear();
 		   distTo.clear();
 		   Queue<Integer> q = new Queue<Integer>();
@@ -258,9 +271,10 @@ public class SAP {
 				   }
 			   }
 		   }
+//		   StdOut.println("time elapsed in single bfs: " + (System.nanoTime() - startTime));
 	   }
 	   private void bfs(Iterable<Integer> s, HashMap<Integer, Integer> distTo, ArrayList<Bag<Integer>> markedS) {		   
-
+//		   long startTime = System.nanoTime();
 		   marked.clear();
 		   distTo.clear();
 		   Queue<Integer> q = new Queue<Integer>();
@@ -289,6 +303,7 @@ public class SAP {
 				   }
 			   }
 		   }
+//		   StdOut.println("time elapsed in multiple bfs: " + (System.nanoTime() - startTime));
 	   }
 	   private Iterable<Integer> pathTo(int v, int[] distTo, int[] edgeTo) {	        
 	        Stack<Integer> path = new Stack<Integer>();
@@ -313,10 +328,10 @@ public class SAP {
 	   // do unit testing of this class
 	   public static void main(String[] args) {
 //		   In in = new In(args[0]);
-		   In in = new In("wordnet\\digraph1.txt");
+		   In in = new In("wordnet\\digraph3.txt");
 		   Digraph G = new Digraph(in);		   
 		   SAP sap = new SAP(G);
-		   StdOut.println("length: " + sap.length(11, 12) + " ancestor: "+ sap.ancestor(11, 12));
+		   StdOut.println("length: " + sap.length(14, 7) + " ancestor: "+ sap.ancestor(14, 7));
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
 //		        int w = StdIn.readInt();
@@ -324,15 +339,17 @@ public class SAP {
 //		        int ancestor = sap.ancestor(v, w);
 //		        StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
 //		    }
-		    Bag<Integer> v = new Bag<Integer>();
-		    Bag<Integer> w = new Bag<Integer>();
-		    v.add(1);
-		    v.add(2);
-		    w.add(2);
-		    w.add(3);
-		    w.add(4);
-	        int length   = sap.length(v, w);	        
-	        int ancestor = sap.ancestor(v, w);
-		    StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
+//		    Bag<Integer> v = new Bag<Integer>();
+//		    Bag<Integer> w = new Bag<Integer>();
+//		    v.add(11);
+//		    w.add(12);
+//		    v.add(1);
+//		    v.add(2);
+//		    w.add(2);
+//		    w.add(3);
+//		    w.add(4);
+//	        int length   = sap.length(v, w);	        
+//	        int ancestor = sap.ancestor(v, w);
+//		    StdOut.printf("length = %d, ancestor = %d\n", length, ancestor);
 	   }
 }
