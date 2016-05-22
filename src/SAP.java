@@ -102,62 +102,55 @@ public class SAP {
 	   private class FindSAP {
 //		   long startTime = System.nanoTime();
 		   int minDist = INFINITY;		   
-		   int lvlMinDist = INFINITY;
-		   int prevLvlMinDist = 0;
 		   int tmpDist;
 		   int ancestor = -1;
-
-		   public FindSAP() {
-			   searchV: {
-				   for (Bag<Integer> b : markedV) {
-					   lvlMinDist = INFINITY;
-					   for (int x : b) {
-						   if (distV.containsKey(x) & distW.containsKey(x)) {
-							   tmpDist = distV.get(x) + distW.get(x);
-//							   StdOut.println("x: " + x + ", tmpDist: " + tmpDist);
-							   if (tmpDist == 0) {
-								   minDist = tmpDist;
-								   ancestor = x;								   
-								   return;						   
-							   }
-							   if (tmpDist <= minDist) {
-								   minDist = tmpDist;
-								   ancestor = x;
-							   }
-							   
-//							   else {
-//								   break searchV;
-//							   }
-						   }				   
-					   }					   
+		   int distFromV = 0, distFromW = 0;
+		   public FindSAP() {			   
+//			   while(distFromV <= minDist & distFromV < markedV.size()) {				   
+				   while(distFromV < markedV.size()) {
+				   StdOut.print(distFromV + " | ");
+				   for(int x : markedV.get(distFromV)) {
+					   StdOut.print(x + ", ");
+					   if (distV.containsKey(x) & distW.containsKey(x)) {
+						   tmpDist = distV.get(x) + distW.get(x);
+						   if (tmpDist == 0) {
+							   minDist = tmpDist;
+							   ancestor = x;								   
+							   return;						   
+						   }
+						   if (tmpDist <= minDist) {
+							   minDist = tmpDist;
+							   ancestor = x;
+						   }
+					   }
 				   }
+				   StdOut.println();
+				   distFromV += 1;
 			   }
-			   searchW: {
-				   for (Bag<Integer> b : markedW) {
-					   lvlMinDist = INFINITY;					   
-					   for (int x : b) {						   
-						if (distV.containsKey(x) & distW.containsKey(x)) {
-							tmpDist = distV.get(x) + distW.get(x);
-//							StdOut.println("x: " + x + ", tmpDist: " + tmpDist);
-							   if (tmpDist == 0) {
-								   minDist = tmpDist;
-								   ancestor = x;								   
-								   return;						   
-							   }
-							   if (tmpDist <= minDist) {
-								   minDist = tmpDist;
-								   ancestor = x;
-							   }
-							   
-//							   else {
-//								   break searchW;
-//							   }
-						   }				   
-					   }					   
+//			   while(distFromW <= minDist & distFromW < markedW.size()) {				   
+				   while(distFromW < markedW.size()) {
+				   StdOut.print(distFromW + " | ");
+				   for(int x : markedW.get(distFromW)) {
+					   StdOut.print(x + ", ");
+					   if (distV.containsKey(x) & distW.containsKey(x)) {
+						   tmpDist = distV.get(x) + distW.get(x);
+						   if (tmpDist == 0) {
+							   minDist = tmpDist;
+							   ancestor = x;								   
+							   return;						   
+						   }
+						   if (tmpDist <= minDist) {
+							   minDist = tmpDist;
+							   ancestor = x;
+						   }
+					   }
 				   }
+				   StdOut.println();
+				   distFromW += 1;
 			   }
-//			   StdOut.println("time elapsed in FindSAP: " + (System.nanoTime() - startTime));
+				   
 		   }
+
 		   public int getSAPDist() {
 			   if (minDist != INFINITY) {
 				   return minDist;
@@ -174,79 +167,7 @@ public class SAP {
 				   return -1;
 			   }
 		   }
-	   }
-	   private void sap(int v, int w) {
-		   int minDist = INFINITY;		   
-		   int tmpDist;
-		   int ancestor = -1;
-		   HashSet<Integer> query = new HashSet<Integer>();
-		   query.add(v);
-		   query.add(w);
-		   searchV: {
-			   for (Bag<Integer> b : markedV) {
-				   for (int x : b) {
-//					   if (distV[x] != INFINITY & distW[x] != INFINITY) {
-					   if (distV.containsKey(x) & distW.containsKey(x)) {
-//						   tmpDist = distV[x] + distW[x];
-						   tmpDist = distV.get(x) + distW.get(x);
-//						   StdOut.println(x + " tmpDist: " + tmpDist);
-						   if (tmpDist == 0) {
-							   minDist = tmpDist;
-							   ancestor = x;
-							   sapDist.put(query, minDist);
-							   sapAncestor.put(query, ancestor);
-							   return;						   
-						   }
-						   if (tmpDist <= minDist) {
-							   minDist = tmpDist;
-							   ancestor = x;
-						   }
-//						   else {
-//							   break searchV;
-//						   }
-					   }				   
-				   }
-			   }
-		   }
-		   searchW: {
-			   for (Bag<Integer> b : markedW) {
-				   for (int x : b) {
-//					   if (distV[x] != INFINITY & distW[x] != INFINITY) {
-					if (distV.containsKey(x) & distW.containsKey(x)) {
-//						   tmpDist = distV[x] + distW[x];
-						tmpDist = distV.get(x) + distW.get(x);
-//						   StdOut.println(x + " tmpDist: " + tmpDist);
-						   if (tmpDist == 0) {
-							   minDist = tmpDist;
-							   ancestor = x;
-							   sapDist.put(query, minDist);
-							   sapAncestor.put(query, ancestor);
-							   return;						   
-						   }
-						   if (tmpDist <= minDist) {
-							   minDist = tmpDist;
-							   ancestor = x;
-						   }
-//						   else {
-//							   break searchW;
-//						   }
-					   }				   
-				   }
-			   }
-		   }		   
-
-		   if (ancestor == -1) {
-			   sapDist.put(query, -1);
-			   sapAncestor.put(query, ancestor);
-			   return;
-		   }
-		   else {
-			   sapDist.put(query, minDist);
-			   sapAncestor.put(query, ancestor);
-		   }
 	   }	   
-	   
-	   
 	   private void bfs(int s, HashMap<Integer, Integer> distTo, ArrayList<Bag<Integer>> markedS) {		   
 //		   long startTime = System.nanoTime();
 		   marked.clear();
@@ -305,14 +226,7 @@ public class SAP {
 		   }
 //		   StdOut.println("time elapsed in multiple bfs: " + (System.nanoTime() - startTime));
 	   }
-	   private Iterable<Integer> pathTo(int v, int[] distTo, int[] edgeTo) {	        
-	        Stack<Integer> path = new Stack<Integer>();
-	        int x;
-	        for (x = v; distTo[x] != 0; x = edgeTo[x])
-	            path.push(x);
-	        path.push(x);
-	        return path;
-	    }
+	   
 	   private void printArray(int[] array) {
 		   for (int i = 0; i < array.length; i++) {
 			   StdOut.print(array[i] + ", ");
@@ -328,10 +242,10 @@ public class SAP {
 	   // do unit testing of this class
 	   public static void main(String[] args) {
 //		   In in = new In(args[0]);
-		   In in = new In("wordnet\\digraph3.txt");
+		   In in = new In("wordnet\\digraph_test.txt");
 		   Digraph G = new Digraph(in);		   
 		   SAP sap = new SAP(G);
-		   StdOut.println("length: " + sap.length(14, 7) + " ancestor: "+ sap.ancestor(14, 7));
+		   StdOut.println("length: " + sap.length(1, 2) + " ancestor: "+ sap.ancestor(1, 2));
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
 //		        int w = StdIn.readInt();
