@@ -179,7 +179,8 @@ public class SAP {
 			   }
 		   }
 	   }	   
-	   private void bfs(int s, HashMap<Integer, Integer> distTo, ArrayList<Bag<Integer>> markedS) {		   
+	   private void bfs(int s, HashMap<Integer, Integer> distTo, ArrayList<Bag<Integer>> markedS) {
+		   //TODO implement early exit here
 //		   long startTime = System.nanoTime();
 		   marked.clear();
 		   distTo.clear();
