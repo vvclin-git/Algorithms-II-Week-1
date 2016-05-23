@@ -106,15 +106,16 @@ public class SAP {
 		   int ancestor = -1;
 		   int distFromV = 0, distFromW = 0;		   
 		   public FindSAP() {
+//			   StdOut.println(distV.get(10));
 //			   printMarkedS(markedV);
 //			   printMarkedS(markedW);
 			   marked.clear();
 //			   while(distFromV <= minDist & distFromV < markedV.size()) {				   
 				   while(distFromV < markedV.size()) {
-				   StdOut.print(distFromV + " | ");
+//				   StdOut.print(distFromV + " | ");
 				   for(int x : markedV.get(distFromV)) {
 					   if (!marked.contains(x)) {
-						   StdOut.print(x + ", ");
+//						   StdOut.print(x + ", ");
 						   if (distV.containsKey(x) & distW.containsKey(x)) {
 							   tmpDist = distV.get(x) + distW.get(x);
 							   marked.add(x);
@@ -130,15 +131,15 @@ public class SAP {
 						   }
 					   }					   
 				   }
-				   StdOut.println();
+//				   StdOut.println();
 				   distFromV += 1;
 			   }
 //			   while(distFromW <= minDist & distFromW < markedW.size()) {				   
 				   while(distFromW < markedW.size()) {
-				   StdOut.print(distFromW + " | ");
+//				   StdOut.print(distFromW + " | ");
 				   for(int x : markedW.get(distFromW)) {
 					   if (!marked.contains(x)) {
-						   StdOut.print(x + ", ");
+//						   StdOut.print(x + ", ");
 						   if (distV.containsKey(x) & distW.containsKey(x)) {
 							   tmpDist = distV.get(x) + distW.get(x);
 							   marked.add(x);
@@ -155,10 +156,10 @@ public class SAP {
 					   }
 					   
 				   }
-				   StdOut.println();
+//				   StdOut.println();
 				   distFromW += 1;
 			   }
-				   
+//			   StdOut.println(System.nanoTime() - startTime);
 		   }
 
 		   public int getSAPDist() {
