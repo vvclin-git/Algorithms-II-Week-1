@@ -100,68 +100,50 @@ public class SAP {
 	   
 
 	   private class FindSAP {
-//		   long startTime = System.nanoTime();
+		   //		   long startTime = System.nanoTime();
 		   int minDist = INFINITY;		   
 		   int tmpDist;
 		   int ancestor = -1;
 		   int distFromV = 0, distFromW = 0;		   
-		   public FindSAP() {
-//			   StdOut.println(distV.get(10));
-//			   printMarkedS(markedV);
-//			   printMarkedS(markedW);
-			   marked.clear();
-//			   while(distFromV <= minDist & distFromV < markedV.size()) {				   
-				   while(distFromV < markedV.size()) {
-//				   StdOut.print(distFromV + " | ");
-				   for(int x : markedV.get(distFromV)) {
-					   if (!marked.contains(x)) {
-//						   StdOut.print(x + ", ");
-						   if (distV.containsKey(x) & distW.containsKey(x)) {
-							   tmpDist = distV.get(x) + distW.get(x);
-							   marked.add(x);
-							   if (tmpDist == 0) {
-								   minDist = tmpDist;
-								   ancestor = x;								   
-								   return;						   
-							   }
-							   if (tmpDist <= minDist) {
-								   minDist = tmpDist;
-								   ancestor = x;
-							   }
-						   }
-					   }					   
-				   }
-//				   StdOut.println();
-				   distFromV += 1;
-			   }
-//			   while(distFromW <= minDist & distFromW < markedW.size()) {				   
-				   while(distFromW < markedW.size()) {
-//				   StdOut.print(distFromW + " | ");
-				   for(int x : markedW.get(distFromW)) {
-					   if (!marked.contains(x)) {
-//						   StdOut.print(x + ", ");
-						   if (distV.containsKey(x) & distW.containsKey(x)) {
-							   tmpDist = distV.get(x) + distW.get(x);
-							   marked.add(x);
-							   if (tmpDist == 0) {
-								   minDist = tmpDist;
-								   ancestor = x;								   
-								   return;						   
-							   }
-							   if (tmpDist <= minDist) {
-								   minDist = tmpDist;
-								   ancestor = x;
-							   }
-						   }
+		   HashMap<Integer, Integer> distV, distW;
+		   public FindSAP(int v, int w) {
+			   int v1, w1;
+			   distV = new HashMap<Integer, Integer>();
+			   distW = new HashMap<Integer, Integer>();
+			   HashSet<Integer> lastVisited = new HashSet<Integer>();
+			   Queue<Integer> qV = new Queue<Integer>();
+			   Queue<Integer> qW = new Queue<Integer>();
+			   qV.enqueue(v);
+			   distV.put(v, 0);
+			   qW.enqueue(w);
+			   distW.put(w, 0);
+			   while((!qV.isEmpty()) | (!qW.isEmpty())) {
+				   v1 = qV.dequeue();
+				   w1 = qW.dequeue();
+				   for (int v2 : G.adj(v1)) {
+					   if (!distV.containsKey(v2)) {						   					   
+						   distV.put(v2, distV.get(v1) + 1);						   
+						   qV.enqueue(v2);
 					   }
-					   
 				   }
-//				   StdOut.println();
-				   distFromW += 1;
+				   for (int w2 : G.adj(w1)) {
+					   if (!distW.containsKey(w2)) {						   					   
+						   distW.put(w2, distW.get(w1) + 1);
+						   if (distV.get(w2) != null) {
+							   tmpDist = distV.get(w2) + distW.get(w2);
+							   if (tmpDist <= minDist) {
+								   ancestor = w2;
+								   minDist = tmpDist;
+							   }
+						   }
+						   qW.enqueue(w2);
+					   }
+				   }				   
 			   }
-//			   StdOut.println(System.nanoTime() - startTime);
 		   }
+		   //			   StdOut.println(System.nanoTime() - startTime);
 
+		   
 		   public int getSAPDist() {
 			   if (minDist != INFINITY) {
 				   return minDist;
@@ -180,7 +162,7 @@ public class SAP {
 		   }
 	   }	   
 	   private void bfs(int s, HashMap<Integer, Integer> distTo, ArrayList<Bag<Integer>> markedS) {
-		   //TODO implement early exit here
+		   
 //		   long startTime = System.nanoTime();
 		   marked.clear();
 		   distTo.clear();
