@@ -104,25 +104,31 @@ public class SAP {
 		   int minDist = INFINITY;		   
 		   int tmpDist;
 		   int ancestor = -1;
-		   int distFromV = 0, distFromW = 0;
-		   public FindSAP() {			   
+		   int distFromV = 0, distFromW = 0;		   
+		   public FindSAP() {
+//			   printMarkedS(markedV);
+//			   printMarkedS(markedW);
+			   marked.clear();
 //			   while(distFromV <= minDist & distFromV < markedV.size()) {				   
 				   while(distFromV < markedV.size()) {
 				   StdOut.print(distFromV + " | ");
 				   for(int x : markedV.get(distFromV)) {
-					   StdOut.print(x + ", ");
-					   if (distV.containsKey(x) & distW.containsKey(x)) {
-						   tmpDist = distV.get(x) + distW.get(x);
-						   if (tmpDist == 0) {
-							   minDist = tmpDist;
-							   ancestor = x;								   
-							   return;						   
+					   if (!marked.contains(x)) {
+						   StdOut.print(x + ", ");
+						   if (distV.containsKey(x) & distW.containsKey(x)) {
+							   tmpDist = distV.get(x) + distW.get(x);
+							   marked.add(x);
+							   if (tmpDist == 0) {
+								   minDist = tmpDist;
+								   ancestor = x;								   
+								   return;						   
+							   }
+							   if (tmpDist <= minDist) {
+								   minDist = tmpDist;
+								   ancestor = x;
+							   }
 						   }
-						   if (tmpDist <= minDist) {
-							   minDist = tmpDist;
-							   ancestor = x;
-						   }
-					   }
+					   }					   
 				   }
 				   StdOut.println();
 				   distFromV += 1;
@@ -131,19 +137,23 @@ public class SAP {
 				   while(distFromW < markedW.size()) {
 				   StdOut.print(distFromW + " | ");
 				   for(int x : markedW.get(distFromW)) {
-					   StdOut.print(x + ", ");
-					   if (distV.containsKey(x) & distW.containsKey(x)) {
-						   tmpDist = distV.get(x) + distW.get(x);
-						   if (tmpDist == 0) {
-							   minDist = tmpDist;
-							   ancestor = x;								   
-							   return;						   
-						   }
-						   if (tmpDist <= minDist) {
-							   minDist = tmpDist;
-							   ancestor = x;
+					   if (!marked.contains(x)) {
+						   StdOut.print(x + ", ");
+						   if (distV.containsKey(x) & distW.containsKey(x)) {
+							   tmpDist = distV.get(x) + distW.get(x);
+							   marked.add(x);
+							   if (tmpDist == 0) {
+								   minDist = tmpDist;
+								   ancestor = x;								   
+								   return;						   
+							   }
+							   if (tmpDist <= minDist) {
+								   minDist = tmpDist;
+								   ancestor = x;
+							   }
 						   }
 					   }
+					   
 				   }
 				   StdOut.println();
 				   distFromW += 1;
@@ -180,11 +190,11 @@ public class SAP {
 		   q.enqueue(s);		   		   
 		   while (!q.isEmpty()) {
 			   int v = q.dequeue();
-			   if (G.outdegree(v) > 0) {
-				   markedS.add(new Bag<Integer>());
-			   }			   
 			   for (int w : G.adj(v)) {
 				   if (!marked.contains(w)) {
+					   if (markedS.size() - 1 < (distTo.get(v) + 1)) {
+						   markedS.add(new Bag<Integer>());
+					   }					   
 					   distTo.put(w, distTo.get(v) + 1);
 					   markedS.get(distTo.get(w)).add(w);
 					   marked.add(w);
@@ -211,12 +221,12 @@ public class SAP {
 			   q.enqueue(s1);
 		   }		   
 		   while (!q.isEmpty()) {
-			   int v = q.dequeue();
-			   if (G.outdegree(v) > 0) {
-				   markedS.add(new Bag<Integer>());
-			   }			   
+			   int v = q.dequeue();			   			   
 			   for (int w : G.adj(v)) {
 				   if (!marked.contains(w)) {
+					   if (markedS.size() - 1 < (distTo.get(v) + 1)) {
+						   markedS.add(new Bag<Integer>());
+					   }
 					   distTo.put(w, distTo.get(v) + 1);
 					   markedS.get(distTo.get(w)).add(w);
 					   marked.add(w);					   
@@ -239,10 +249,21 @@ public class SAP {
 		   }
 		   StdOut.println();
 	   }
+	   private void printMarkedS(ArrayList<Bag<Integer>> markedS) {
+		   StdOut.println();
+		   for (Bag<Integer> b : markedS) {
+			   StdOut.print("{");
+			   for (int x : b) {
+				   StdOut.print(x + ", ");
+			   }
+			   StdOut.print("}, ");
+		   }
+		   StdOut.println();
+	   }
 	   // do unit testing of this class
 	   public static void main(String[] args) {
 //		   In in = new In(args[0]);
-		   In in = new In("wordnet\\digraph_test.txt");
+		   In in = new In("wordnet\\digraph_test2.txt");
 		   Digraph G = new Digraph(in);		   
 		   SAP sap = new SAP(G);
 		   StdOut.println("length: " + sap.length(1, 2) + " ancestor: "+ sap.ancestor(1, 2));
