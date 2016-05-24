@@ -14,7 +14,7 @@ public class SAP {
 	private Digraph G;	
 	private HashMap<HashSet<Integer>, Integer> sapDist;
 	private HashMap<HashSet<Integer>, Integer> sapAncestor;
-	public int numVisited;
+//	public int numVisited;
 	   // constructor takes a digraph (not necessarily a DAG)
 	   public SAP(Digraph G) {
 		   this.G = G;		   
@@ -32,7 +32,7 @@ public class SAP {
 //			   StdOut.println("time elapsed in single length: " + (System.nanoTime() - startTime));
 			   sapDist.put(query, findSAP.getSAPDist());
 			   sapAncestor.put(query, findSAP.getSAPAncestor());
-			   numVisited = findSAP.getNumVisited();
+//			   numVisited = findSAP.getNumVisited();
 			   return sapDist.get(query);
 		   }
 		   else {
@@ -130,16 +130,18 @@ public class SAP {
 		   private void sapBFS(Queue<Integer> qV, Queue<Integer> qW) {
 			   int v1, w1;
 			   boolean exitV = false, exitW = false;
-			   while(((!qV.isEmpty()) | (!qW.isEmpty()))) {
-				   if (!qV.isEmpty()) {
+//			   while(((!qV.isEmpty()) | (!qW.isEmpty()))) {
+//			   while((!exitV & !exitW) | !qV.isEmpty() | !qW.isEmpty()) {
+			   while((!qV.isEmpty() & !exitV) | (!qW.isEmpty() & !exitW)) {
+				   if (!qV.isEmpty() & !exitV) {
 					   v1 = qV.dequeue();					   
-					   if (distV.get(v1) == minDist) {
-						   exitV = true;						   
+					   if (distV.get(v1) == minDist) {						  
+						   exitV = true;						  					  
 					   }
 					   if (!exitV) {
 						   for (int v2 : G.adj(v1)) {
+							   numVisited += 1;
 							   if (!distV.containsKey(v2)) {
-//								   if (distV.get(v1) + 1 <= minDist) {
 									   distV.put(v2, distV.get(v1) + 1);
 									   if (distW.get(v2) != null) {
 										   tmpDist = distV.get(v2) + distW.get(v2);
@@ -149,55 +151,33 @@ public class SAP {
 										   }
 									   }
 									   qV.enqueue(v2);
-									   numVisited += 1;
-									   if (qV.size() >= qVSize) {
-										   qVSize = qV.size();
-									   }
-//								   }
-//								   else {
-////									   StdOut.println("early exit");
-////									   return;
-//									   break;
-//								   }
 							   }
 						   }
 					   }
 					   
 				   }
-				   if (!qW.isEmpty()) {
+				   if (!qW.isEmpty() & !exitW) {
 					   w1 = qW.dequeue();
 					   if (distW.get(w1) == minDist) {
-						   exitW = true;
-//						   return;
+						   exitW = true;						   
 					   }
 					   if (!exitW) {
-						   for (int w2 : G.adj(w1)) {						   
-							   if (!distW.containsKey(w2)) {							   
-//								   if (distW.get(w1) + 1 <= minDist) {
-									   distW.put(w2, distW.get(w1) + 1);
-									   if (distV.get(w2) != null) {
-										   tmpDist = distV.get(w2) + distW.get(w2);
-										   if (tmpDist <= minDist) {
-											   ancestor = w2;
-											   minDist = tmpDist;
-										   }
+						   for (int w2 : G.adj(w1)) {
+							   numVisited += 1;
+							   if (!distW.containsKey(w2)) {								   
+								   distW.put(w2, distW.get(w1) + 1);
+								   if (distV.get(w2) != null) {
+									   tmpDist = distV.get(w2) + distW.get(w2);
+									   if (tmpDist <= minDist) {
+										   ancestor = w2;
+										   minDist = tmpDist;
 									   }
-									   qW.enqueue(w2);
-									   numVisited += 1;
-									   if (qW.size() >= qWSize) {
-										   qWSize = qW.size();
-									   }
-//								   }
-//								   else {
-////									   StdOut.println("early exit");
-////									   return;
-//									   break;
-//								   }
+								   }
+								   qW.enqueue(w2);
 							   }
 						   }
 					   }
-					   
-				   		}				   
+				   }				   
 			   }
 		   }
 		   public int getSAPDist() {
@@ -253,35 +233,37 @@ public class SAP {
 	   // do unit testing of this class
 	   public static void main(String[] args) {
 //		   In in = new In(args[0]);
-
+		   
+//		   int numVisited = 0;
 //		   In in = new In("wordnet\\digraph_test2.txt");
 //		   Digraph G = new Digraph(in);		   
 //		   SAP sap = new SAP(G);		   
 //		   StdOut.println("length: " + sap.length(1, 2) + " ancestor: "+ sap.ancestor(1, 2));
-
+//		   numVisited += sap.numVisited;
+//		   StdOut.println(numVisited);
 		   
-		   In in = new In("wordnet\\digraph-wordnet.txt");
-		   Digraph G = new Digraph(in);		   
-		   SAP sap = new SAP(G);
-		   Random rand = new Random();		   
-		   int min = 0;
-		   int max = 82191;
-		   int numCalls = 100000;
-		   int randomNum1, randomNum2;
-		   int numVisited = 0;
-		   long startTime = System.nanoTime();
-		   for (int i = 0; i < numCalls; i++) {			   
-			   randomNum1 = rand.nextInt((max - min) + 1) + min;
-			   randomNum2 = rand.nextInt((max - min) + 1) + min;
-			   sap.length(randomNum1, randomNum2);
-			   numVisited += sap.numVisited;
-		   }
-		   long time = System.nanoTime() - startTime;
-		   double callSec = numCalls  / (double) time;
-		   StdOut.println("time elapsed in during calls: " + time);
-		   StdOut.println("calls / sec: " + callSec* 1000000000);
-		   StdOut.println(numVisited);
-		   StdOut.println("avg. vertices visited per call: " +  (numVisited / (double) numCalls));
+//		   In in = new In("wordnet\\digraph-wordnet.txt");
+//		   Digraph G = new Digraph(in);		   
+//		   SAP sap = new SAP(G);
+//		   Random rand = new Random();		   
+//		   int min = 0;
+//		   int max = 82191;
+//		   int numCalls = 100000;
+//		   int randomNum1, randomNum2;
+//		   int numVisited = 0;
+//		   long startTime = System.nanoTime();
+//		   for (int i = 0; i < numCalls; i++) {			   
+//			   randomNum1 = rand.nextInt((max - min) + 1) + min;
+//			   randomNum2 = rand.nextInt((max - min) + 1) + min;
+//			   sap.length(randomNum1, randomNum2);
+//			   numVisited += sap.numVisited;
+//		   }
+//		   long time = System.nanoTime() - startTime;
+//		   double callSec = numCalls  / (double) time;
+//		   StdOut.println("time elapsed in during calls: " + time);
+//		   StdOut.println("calls / sec: " + callSec* 1000000000);
+//		   StdOut.println(numVisited);
+//		   StdOut.println("avg. vertices visited per call: " +  (numVisited / (double) numCalls));
 		   
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
