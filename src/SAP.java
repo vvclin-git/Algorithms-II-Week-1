@@ -14,7 +14,7 @@ public class SAP {
 	private Digraph G;	
 	private HashMap<HashSet<Integer>, Integer> sapDist;
 	private HashMap<HashSet<Integer>, Integer> sapAncestor;
-//	public int numVisited;
+	public int numVisited;
 	   // constructor takes a digraph (not necessarily a DAG)
 	   public SAP(Digraph G) {
 		   this.G = G;		   
@@ -32,7 +32,7 @@ public class SAP {
 //			   StdOut.println("time elapsed in single length: " + (System.nanoTime() - startTime));
 			   sapDist.put(query, findSAP.getSAPDist());
 			   sapAncestor.put(query, findSAP.getSAPAncestor());
-//			   numVisited = findSAP.getNumVisited();
+			   numVisited = findSAP.getNumVisited();
 			   return sapDist.get(query);
 		   }
 		   else {
@@ -132,6 +132,9 @@ public class SAP {
 			   boolean exitV = false, exitW = false;
 //			   while(((!qV.isEmpty()) | (!qW.isEmpty()))) {
 //			   while((!exitV & !exitW) | !qV.isEmpty() | !qW.isEmpty()) {
+			   HashSet<Integer> visited = new HashSet<Integer>();
+			   visited.add(qV.peek());
+			   visited.add(qW.peek());
 			   while((!qV.isEmpty() & !exitV) | (!qW.isEmpty() & !exitW)) {
 				   if (!qV.isEmpty() & !exitV) {
 					   v1 = qV.dequeue();					   
@@ -140,8 +143,10 @@ public class SAP {
 					   }
 					   if (!exitV) {
 						   for (int v2 : G.adj(v1)) {
-							   numVisited += 1;
+							   
 							   if (!distV.containsKey(v2)) {
+								   numVisited += 1;
+								   visited.add(v2);
 									   distV.put(v2, distV.get(v1) + 1);
 									   if (distW.get(v2) != null) {
 										   tmpDist = distV.get(v2) + distW.get(v2);
@@ -163,8 +168,10 @@ public class SAP {
 					   }
 					   if (!exitW) {
 						   for (int w2 : G.adj(w1)) {
-							   numVisited += 1;
-							   if (!distW.containsKey(w2)) {								   
+							   
+							   if (!distW.containsKey(w2)) {
+								   numVisited += 1;
+								   visited.add(w2);
 								   distW.put(w2, distW.get(w1) + 1);
 								   if (distV.get(w2) != null) {
 									   tmpDist = distV.get(w2) + distW.get(w2);
@@ -179,6 +186,8 @@ public class SAP {
 					   }
 				   }				   
 			   }
+			   StdOut.println("number of visited nodes: " + visited.size());
+			   StdOut.println("visited nodes: " + visited.toString());
 		   }
 		   public int getSAPDist() {
 			   if (minDist != INFINITY) {
@@ -240,6 +249,14 @@ public class SAP {
 //		   SAP sap = new SAP(G);		   
 //		   StdOut.println("length: " + sap.length(1, 2) + " ancestor: "+ sap.ancestor(1, 2));
 //		   numVisited += sap.numVisited;
+//		   StdOut.println(numVisited);
+		   
+		   int numVisited = 0;
+		   In in = new In("wordnet\\digraph-wordnet.txt");
+		   Digraph G = new Digraph(in);		   
+		   SAP sap = new SAP(G);		   
+		   StdOut.println("length: " + sap.length(23231, 23302) + " ancestor: "+ sap.ancestor(23231, 23302));
+		   numVisited += sap.numVisited;
 //		   StdOut.println(numVisited);
 		   
 //		   In in = new In("wordnet\\digraph-wordnet.txt");
