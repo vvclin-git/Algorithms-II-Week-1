@@ -137,7 +137,8 @@ public class SAP {
 			   visited.add(qW.peek());
 			   while((!qV.isEmpty() & !exitV) | (!qW.isEmpty() & !exitW)) {
 				   if (!qV.isEmpty() & !exitV) {
-					   v1 = qV.dequeue();					   
+					   v1 = qV.dequeue();
+					   // early exit condition
 					   if (distV.get(v1) == minDist) {						  
 						   exitV = true;						  					  
 					   }
@@ -163,6 +164,7 @@ public class SAP {
 				   }
 				   if (!qW.isEmpty() & !exitW) {
 					   w1 = qW.dequeue();
+					   // early exit condition
 					   if (distW.get(w1) == minDist) {
 						   exitW = true;						   
 					   }
