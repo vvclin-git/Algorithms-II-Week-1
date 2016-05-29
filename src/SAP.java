@@ -129,6 +129,7 @@ public class SAP {
 		   }
 		   private void sapBFS(Queue<Integer> qV, Queue<Integer> qW) {
 			   int v1, w1;
+			   int nextDist;
 			   boolean exitV = false, exitW = false;
 //			   while(((!qV.isEmpty()) | (!qW.isEmpty()))) {
 //			   while((!exitV & !exitW) | !qV.isEmpty() | !qW.isEmpty()) {
@@ -143,20 +144,20 @@ public class SAP {
 						   exitV = true;						  					  
 					   }
 					   if (!exitV) {
-						   for (int v2 : G.adj(v1)) {
-							   
+						   for (int v2 : G.adj(v1)) {							   
 							   if (!distV.containsKey(v2)) {
 								   numVisited += 1;
 								   visited.add(v2);
-									   distV.put(v2, distV.get(v1) + 1);
-									   if (distW.get(v2) != null) {
-										   tmpDist = distV.get(v2) + distW.get(v2);
-										   if (tmpDist <= minDist) {
-											   ancestor = v2;
-											   minDist = tmpDist;
-										   }
+								   nextDist = distV.get(v1) + 1;
+								   distV.put(v2, nextDist);								   
+								   if (distW.containsKey(v2)) {
+									   tmpDist = nextDist + distW.get(v2);
+									   if (tmpDist <= minDist) {
+										   ancestor = v2;
+										   minDist = tmpDist;
 									   }
-									   qV.enqueue(v2);
+								   }
+								   qV.enqueue(v2);
 							   }
 						   }
 					   }
@@ -169,14 +170,15 @@ public class SAP {
 						   exitW = true;						   
 					   }
 					   if (!exitW) {
-						   for (int w2 : G.adj(w1)) {
-							   
+						   for (int w2 : G.adj(w1)) {							   
 							   if (!distW.containsKey(w2)) {
 								   numVisited += 1;
 								   visited.add(w2);
-								   distW.put(w2, distW.get(w1) + 1);
-								   if (distV.get(w2) != null) {
-									   tmpDist = distV.get(w2) + distW.get(w2);
+								   nextDist = distW.get(w1) + 1;
+								   distW.put(w2, nextDist);
+//								   if (distV.get(w2) != null) {
+								   if (distV.containsKey(w2)) {
+									   tmpDist = distV.get(w2) + nextDist;
 									   if (tmpDist <= minDist) {
 										   ancestor = w2;
 										   minDist = tmpDist;
