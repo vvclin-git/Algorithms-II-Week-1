@@ -171,7 +171,7 @@ public class SAP {
 //								   distV.put(v2, nextDist);
 								   distV[v2] = nextDist;
 //								   if (distW.containsKey(v2)) {
-								   if (distW[v2] != INFINITY)
+								   if (distW[v2] != INFINITY) {
 //									   tmpDist = nextDist + distW.get(v2);
 									   tmpDist = nextDist + distW[v2];
 									   if (tmpDist <= minDist) {
@@ -180,6 +180,7 @@ public class SAP {
 									   }
 								   }
 								   qV.enqueue(v2);
+								   
 							   }
 						   }
 					   }
@@ -217,6 +218,7 @@ public class SAP {
 						   }
 					   }
 				   }
+			   }
 				   for (int s : visitedV) {
 					   distV[s] = INFINITY;					   
 				   }
@@ -285,10 +287,10 @@ public class SAP {
 //		   In in = new In(args[0]);
 		   
 //		   int numVisited = 0;
-		   In in = new In("wordnet\\digraph_test2.txt");
-		   Digraph G = new Digraph(in);		   
-		   SAP sap = new SAP(G);		   
-		   StdOut.println("length: " + sap.length(1, 2) + " ancestor: "+ sap.ancestor(1, 2));
+//		   In in = new In("wordnet\\digraph_test2.txt");
+//		   Digraph G = new Digraph(in);		   
+//		   SAP sap = new SAP(G);		   
+//		   StdOut.println("length: " + sap.length(1, 2) + " ancestor: "+ sap.ancestor(1, 2));
 //		   numVisited += sap.numVisited;
 //		   StdOut.println(numVisited);
 		   
@@ -300,27 +302,27 @@ public class SAP {
 //		   numVisited += sap.numVisited;
 //		   StdOut.println(numVisited);
 		   
-//		   In in = new In("wordnet\\digraph-wordnet.txt");
-//		   Digraph G = new Digraph(in);		   
-//		   SAP sap = new SAP(G);
-//		   Random rand = new Random();		   
-//		   int min = 0;
-//		   int max = 82191;
-//		   int numCalls = 100000;
-//		   int randomNum1, randomNum2;
-//		   int numVisited = 0;
-//		   long startTime = System.nanoTime();
-//		   for (int i = 0; i < numCalls; i++) {			   
-//			   randomNum1 = rand.nextInt((max - min) + 1) + min;
-//			   randomNum2 = rand.nextInt((max - min) + 1) + min;
-//			   sap.length(randomNum1, randomNum2);
-//			   numVisited += sap.numVisited;
-//		   }
-//		   long time = System.nanoTime() - startTime;
-//		   double callSec = numCalls  / (double) time;
-//		   StdOut.println("time elapsed in during calls: " + time);
-//		   StdOut.println("calls / sec: " + callSec* 1000000000);		   
-//		   StdOut.println("avg. vertices visited per call: " +  (numVisited / (double) numCalls));
+		   In in = new In("wordnet\\digraph-wordnet.txt");
+		   Digraph G = new Digraph(in);		   
+		   SAP sap = new SAP(G);
+		   Random rand = new Random();		   
+		   int min = 0;
+		   int max = 82191;
+		   int numCalls = 100000;
+		   int randomNum1, randomNum2;
+		   int numVisited = 0;
+		   long startTime = System.nanoTime();
+		   for (int i = 0; i < numCalls; i++) {			   
+			   randomNum1 = rand.nextInt((max - min) + 1) + min;
+			   randomNum2 = rand.nextInt((max - min) + 1) + min;
+			   sap.length(randomNum1, randomNum2);
+			   numVisited += sap.numVisited;
+		   }
+		   long time = System.nanoTime() - startTime;
+		   double callSec = numCalls  / (double) time;
+		   StdOut.println("time elapsed in during calls: " + time);
+		   StdOut.println("calls / sec: " + callSec* 1000000000);		   
+		   StdOut.println("avg. vertices visited per call: " +  (numVisited / (double) numCalls));
 		   
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
