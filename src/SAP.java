@@ -15,6 +15,7 @@ public class SAP {
 	private HashMap<HashSet<Integer>, Integer> sapDist;
 	private HashMap<HashSet<Integer>, Integer> sapAncestor;
 	private int[] distV, distW;
+	private boolean[] visitedV, visitedW;
 	public int numVisited;
 	   // constructor takes a digraph (not necessarily a DAG)
 	   public SAP(Digraph G) {
@@ -146,33 +147,37 @@ public class SAP {
 			   int v1, w1;
 			   int nextDist;
 			   boolean exitV = false, exitW = false;
-//			   while(((!qV.isEmpty()) | (!qW.isEmpty()))) {
-//			   while((!exitV & !exitW) | !qV.isEmpty() | !qW.isEmpty()) {
-			   HashSet<Integer> visitedV = new HashSet<Integer>();
-			   HashSet<Integer> visitedW = new HashSet<Integer>();
-			   visitedV.add(qV.peek());
-			   visitedW.add(qW.peek());
+			   //			   while(((!qV.isEmpty()) | (!qW.isEmpty()))) {
+			   //			   while((!exitV & !exitW) | !qV.isEmpty() | !qW.isEmpty()) {
+//			   HashSet<Integer> visitedV = new HashSet<Integer>();
+//			   HashSet<Integer> visitedW = new HashSet<Integer>();
+//			   visitedV.add(qV.peek());
+//			   visitedW.add(qW.peek());
+			   visitedV[qV.peek()] = true;
+			   visitedW[qW.peek()] = true;
 			   while((!qV.isEmpty() & !exitV) | (!qW.isEmpty() & !exitW)) {
 				   if (!qV.isEmpty() & !exitV) {
 					   v1 = qV.dequeue();
 					   // early exit condition
-//					   if (distV.get(v1) == minDist) {
-						   if (distV[v1] == minDist) {	   
+					   //					   if (distV.get(v1) == minDist) {
+					   if (distV[v1] == minDist) {	   
 						   exitV = true;						  					  
 					   }
 					   if (!exitV) {
 						   for (int v2 : G.adj(v1)) {							   
-//							   if (!distV.containsKey(v2)) {
-								   if (!visitedV.contains(v2)) {
+							   //							   if (!distV.containsKey(v2)) {
+//							   if (!visitedV.contains(v2)) {
+							   if (!visitedV[v2]) {	   
 								   numVisited += 1;
-								   visitedV.add(v2);
-//								   nextDist = distV.get(v1) + 1;
+//								   visitedV.add(v2);
+								   visitedV[v2] = true;
+								   //								   nextDist = distV.get(v1) + 1;
 								   nextDist = distV[v1] + 1;
-//								   distV.put(v2, nextDist);
+								   //								   distV.put(v2, nextDist);
 								   distV[v2] = nextDist;
-//								   if (distW.containsKey(v2)) {
+								   //								   if (distW.containsKey(v2)) {
 								   if (distW[v2] != INFINITY) {
-//									   tmpDist = nextDist + distW.get(v2);
+									   //									   tmpDist = nextDist + distW.get(v2);
 									   tmpDist = nextDist + distW[v2];
 									   if (tmpDist <= minDist) {
 										   ancestor = v2;
@@ -180,33 +185,35 @@ public class SAP {
 									   }
 								   }
 								   qV.enqueue(v2);
-								   
+
 							   }
 						   }
 					   }
-					   
+
 				   }
 				   if (!qW.isEmpty() & !exitW) {
 					   w1 = qW.dequeue();
 					   // early exit condition
-//					   if (distW.get(w1) == minDist) {
-						   if (distW[w1] == minDist) {
+					   //					   if (distW.get(w1) == minDist) {
+					   if (distW[w1] == minDist) {
 						   exitW = true;						   
 					   }
 					   if (!exitW) {
 						   for (int w2 : G.adj(w1)) {							   
-//							   if (!distW.containsKey(w2)) {
-								   if (!visitedW.contains(w2)) {
+							   //							   if (!distW.containsKey(w2)) {
+//							   if (!visitedW.contains(w2)) {
+							   if (!visitedW[w2]) {	   
 								   numVisited += 1;
-								   visitedW.add(w2);
-//								   nextDist = distW.get(w1) + 1;
+//								   visitedW.add(w2);
+								   visitedW[w2] = true;
+								   //								   nextDist = distW.get(w1) + 1;
 								   nextDist = distW[w1] + 1;
-//								   distW.put(w2, nextDist);
+								   //								   distW.put(w2, nextDist);
 								   distW[w2] = nextDist;
-//								   if (distV.get(w2) != null) {
-//								   if (distV.containsKey(w2)) {
+								   //								   if (distV.get(w2) != null) {
+								   //								   if (distV.containsKey(w2)) {
 								   if (distV[w2] != INFINITY) {
-//									   tmpDist = distV.get(w2) + nextDist;
+									   //									   tmpDist = distV.get(w2) + nextDist;
 									   tmpDist = distV[w2] + nextDist;
 									   if (tmpDist <= minDist) {
 										   ancestor = w2;
@@ -219,14 +226,16 @@ public class SAP {
 					   }
 				   }
 			   }
-				   for (int s : visitedV) {
-					   distV[s] = INFINITY;					   
-				   }
-				   for (int s : visitedW) {					   
-					   distW[s] = INFINITY;
-				   }
-		   
+			   
+
+			   for (int s : visitedV) {
+				   distV[s] = INFINITY;					   
 			   }
+			   for (int s : visitedW) {					   
+				   distW[s] = INFINITY;
+			   }
+
+		   }
 //			   StdOut.println("number of visited nodes: " + visited.size());
 //			   StdOut.println("visited nodes: " + visited.toString());
 		   
