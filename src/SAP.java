@@ -18,7 +18,7 @@ public class SAP {
 //	public int numVisited;
 	   // constructor takes a digraph (not necessarily a DAG)
 	   public SAP(Digraph G) {
-		   this.G = G;		   
+		   this.G = new Digraph(G);	   
 		   this.sapDist = new HashMap<HashSet<Integer>, Integer>();
 		   this.sapAncestor = new HashMap<HashSet<Integer>, Integer>();
 		   this.distV = new int[G.V()];
@@ -64,6 +64,7 @@ public class SAP {
 //		   else {
 //			   return sapAncestor.get(query);
 //		   }
+		   
 		   FindSAP findSAP = new FindSAP(v, w);
 		   return findSAP.getSAPAncestor();
 	   }
@@ -141,22 +142,25 @@ public class SAP {
 				   ancestor = -1;
 				   minDist = -1;
 				   return;
-			   }
-			   
+			   }			   
 			   HashSet<Integer> visitedV = new HashSet<Integer>();
 			   HashSet<Integer> visitedW = new HashSet<Integer>();
-			   visitedV.add(qV.peek());
-			   visitedW.add(qW.peek());
+			   for (int v : qV) {
+				   visitedV.add(v);
+			   }
+			   for (int w : qW) {
+				   visitedW.add(w);
+			   }
 			   while((!qV.isEmpty() & !exitV) | (!qW.isEmpty() & !exitW)) {
 				   if (!qV.isEmpty() & !exitV) {
 					   v1 = qV.dequeue();
 					   // early exit condition
-						   if (distV[v1] == minDist) {	   
+					   if (distV[v1] == minDist) {	   
 						   exitV = true;						  					  
 					   }
 					   if (!exitV) {
 						   for (int v2 : G.adj(v1)) {							   
-								   if (!visitedV.contains(v2)) {
+							   if (!visitedV.contains(v2)) {
 								   visitedV.add(v2);
 								   nextDist = distV[v1] + 1;
 								   distV[v2] = nextDist;
@@ -168,21 +172,21 @@ public class SAP {
 									   }
 								   }
 								   qV.enqueue(v2);
-								   
+
 							   }
 						   }
 					   }
-					   
+
 				   }
 				   if (!qW.isEmpty() & !exitW) {
 					   w1 = qW.dequeue();
 					   // early exit condition
-						   if (distW[w1] == minDist) {
+					   if (distW[w1] == minDist) {
 						   exitW = true;						   
 					   }
 					   if (!exitW) {
 						   for (int w2 : G.adj(w1)) {							   
-								   if (!visitedW.contains(w2)) {
+							   if (!visitedW.contains(w2)) {
 								   visitedW.add(w2);
 								   nextDist = distW[w1] + 1;
 								   distW[w2] = nextDist;
@@ -199,17 +203,17 @@ public class SAP {
 					   }
 				   }
 			   }
-				   for (int s : visitedV) {
-					   distV[s] = INFINITY;					   
-				   }
-				   for (int s : visitedW) {					   
-					   distW[s] = INFINITY;
-				   }
-				   
-//			    printArray(distV);
-//			    printArray(distW);
-	   
+			   for (int s : visitedV) {
+				   distV[s] = INFINITY;					   
 			   }
+			   for (int s : visitedW) {					   
+				   distW[s] = INFINITY;
+			   }
+
+			   //			    printArray(distV);
+			   //			    printArray(distW);
+
+		   }
 //			   StdOut.println("number of visited nodes: " + visited.size());
 //			   StdOut.println("visited nodes: " + visited.toString());
 		   
@@ -269,11 +273,15 @@ public class SAP {
 	   public static void main(String[] args) {
 //		   In in = new In(args[0]);
 		   
-		   int numVisited = 0;
-		   In in = new In("wordnet\\digraph2.txt");
-		   Digraph G = new Digraph(in);		   
-		   SAP sap = new SAP(G);		   
-		   StdOut.println("length: " + sap.length(4, 2) + " ancestor: "+ sap.ancestor(4, 2));
+//		   int numVisited = 0;
+//		   In in = new In("wordnet\\digraph1.txt");
+//		   Digraph G = new Digraph(in);		   
+//		   SAP sap = new SAP(G);		   
+//		   StdOut.println("length: " + sap.length(0, 3) + " ancestor: "+ sap.ancestor(0, 3));
+//		   G.addEdge(0, 0);
+//		   sap = new SAP(G);
+//		   StdOut.println("length: " + sap.length(0, 3) + " ancestor: "+ sap.ancestor(0, 3));
+
 //		   numVisited += sap.numVisited;
 //		   StdOut.println(numVisited);
 		   
@@ -285,27 +293,27 @@ public class SAP {
 //		   numVisited += sap.numVisited;
 //		   StdOut.println(numVisited);
 		   
-//		   In in = new In("wordnet\\digraph-wordnet.txt");
-//		   Digraph G = new Digraph(in);		   
-//		   SAP sap = new SAP(G);
-//		   Random rand = new Random();		   
-//		   int min = 0;
-//		   int max = 82191;
-//		   int numCalls = 100000;
-//		   int randomNum1, randomNum2;
-//		   int numVisited = 0;
-//		   long startTime = System.nanoTime();
-//		   for (int i = 0; i < numCalls; i++) {			   
-//			   randomNum1 = rand.nextInt((max - min) + 1) + min;
-//			   randomNum2 = rand.nextInt((max - min) + 1) + min;
-//			   sap.length(randomNum1, randomNum2);
-////			   numVisited += sap.numVisited;
-//		   }
-//		   long time = System.nanoTime() - startTime;
-//		   double callSec = numCalls  / (double) time;
-//		   StdOut.println("time elapsed in during calls: " + time);
-//		   StdOut.println("calls / sec: " + callSec* 1000000000);		   
-//		   StdOut.println("avg. vertices visited per call: " +  (numVisited / (double) numCalls));
+		   In in = new In("wordnet\\digraph-wordnet.txt");
+		   Digraph G = new Digraph(in);		   
+		   SAP sap = new SAP(G);
+		   Random rand = new Random();		   
+		   int min = 0;
+		   int max = 82191;
+		   int numCalls = 100000;
+		   int randomNum1, randomNum2;
+		   int numVisited = 0;
+		   long startTime = System.nanoTime();
+		   for (int i = 0; i < numCalls; i++) {			   
+			   randomNum1 = rand.nextInt((max - min) + 1) + min;
+			   randomNum2 = rand.nextInt((max - min) + 1) + min;
+			   sap.length(randomNum1, randomNum2);
+//			   numVisited += sap.numVisited;
+		   }
+		   long time = System.nanoTime() - startTime;
+		   double callSec = numCalls  / (double) time;
+		   StdOut.println("time elapsed in during calls: " + time);
+		   StdOut.println("calls / sec: " + callSec* 1000000000);		   
+		   StdOut.println("avg. vertices visited per call: " +  (numVisited / (double) numCalls));
 		   
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
