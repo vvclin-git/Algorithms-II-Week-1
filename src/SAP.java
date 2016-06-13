@@ -192,6 +192,8 @@ public class SAP {
 			   }
 			   visitedV = new HashMap<Integer, Integer>();
 			   visitedW = new HashMap<Integer, Integer>();
+			   distV = new ArrayList<Integer>();
+			   distW = new ArrayList<Integer>();
 			   Queue<Integer> qV = new Queue<Integer>();
 			   Queue<Integer> qW = new Queue<Integer>();
 			   for (int s : v) {
