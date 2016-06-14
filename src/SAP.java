@@ -150,145 +150,121 @@ public class SAP {
 	   
 
 	   private class FindSAP {
-		   //		   long startTime = System.nanoTime();
-		   int minDist = INFINITY;		   
-		   int tmpDist;
-		   int ancestor = -1;		   		   
-		   HashMap<Integer, Integer> visitedV, visitedW;
-		   ArrayList<Integer> distV, distW;
-		   int numVisited = 0;
-		   public FindSAP(int v, int w) {
-			   // trivial case test
-			   if (v == w) {
-				   ancestor = v;
-				   minDist = 0;
-				   return;
-			   }	
-			   visitedV = new HashMap<Integer, Integer>();
-			   visitedW = new HashMap<Integer, Integer>();
-			   distV = new ArrayList<Integer>();
-			   distW = new ArrayList<Integer>();
-			   Queue<Integer> qV = new Queue<Integer>();
-			   Queue<Integer> qW = new Queue<Integer>();
-			   qV.enqueue(v);
-			   visitedV.put(v, 0);
-			   distV.add(0);
-			   qW.enqueue(w);
-			   visitedW.put(w, 0);
-			   distW.add(0);
-			   sapBFS(qV, qW);
-		   }
-		   
-		   public FindSAP(Iterable<Integer> v, Iterable<Integer> w) {
-			   // trivial case test
-			   for (int v1 : v) {
-				   for (int w1 : w) {
-					   if (v1 == w1) {
-						   ancestor = v1;
-						   minDist = 0;
-						   return;
-					   }
-				   }
-			   }
-			   visitedV = new HashMap<Integer, Integer>();
-			   visitedW = new HashMap<Integer, Integer>();
-			   distV = new ArrayList<Integer>();
-			   distW = new ArrayList<Integer>();
-			   Queue<Integer> qV = new Queue<Integer>();
-			   Queue<Integer> qW = new Queue<Integer>();
-			   for (int s : v) {
-				   qV.enqueue(s);
-				   distV.add(0);
-				   visitedV.put(s, distV.size() - 1);
-			   }
-			   for (int s : w) {
-				   qW.enqueue(s);
-				   distW.add(0);
-				   visitedW.put(s, distW.size() - 1);
-			   }			   
-			   sapBFS(qV, qW);
+			int minDist = INFINITY;		   
+			int ancestor = -1;		   		   
 
-		   }
-		   private void sapBFS(Queue<Integer> qV, Queue<Integer> qW) {
-			   int v1, w1;
-			   int indV, indW;
-			   int prevDist;
-			   Integer otherInd;
-			   boolean exitV = false, exitW = false;
-			   while((!qV.isEmpty() & !exitV) | (!qW.isEmpty() & !exitW)) {
-				   if (!qV.isEmpty() & !exitV) {
-					   v1 = qV.dequeue();
-					   prevDist = distV.get(visitedV.get(v1));
-					   // early exit condition
-					   if (prevDist == minDist) {						  
-						   exitV = true;						  					  
-					   }
-					   if (!exitV) {
-						   for (int v2 : G.adj(v1)) {							   
-							   if (!visitedV.containsKey(v2)) {
-								   distV.add(prevDist + 1);
-								   visitedV.put(v2, distV.size() - 1);
-								   otherInd = visitedW.get(v2);
-								   if (otherInd != null) {
-									   tmpDist = (prevDist + 1) + distW.get(otherInd);
-									   if (tmpDist <= minDist) {
-										   ancestor = v2;
-										   minDist = tmpDist;
-									   }
-								   }
-								   qV.enqueue(v2);
-							   }
-						   }
-					   }
+			HashMap<Integer, Integer> alien2me;
+			ArrayList<Integer> dist;
+			ArrayList<Integer> me2alien;
+			ArrayList<Integer> root;
 
-				   }
-				   if (!qW.isEmpty() & !exitW) {
-					   w1 = qW.dequeue();
-					   prevDist = distW.get(visitedW.get(w1));
-					   // early exit condition
-					   if (prevDist == minDist) {
-						   exitW = true;						   
-					   }
-					   if (!exitW) {
-						   for (int w2 : G.adj(w1)) {
-							   if (!visitedW.containsKey(w2)) {
-								   distW.add(prevDist + 1);
-								   visitedW.put(w2, distW.size() - 1);
-								   otherInd = visitedV.get(w2);
-								   if (otherInd != null) {
-									   tmpDist = (prevDist + 1) + distV.get(otherInd);
-									   if (tmpDist <= minDist) {
-										   ancestor = w2;
-										   minDist = tmpDist;
-									   }
-								   }
-								   qW.enqueue(w2);
-							   }
-						   }
-					   }
-				   }				   
-			   }
-		   }
-		   public int getSAPDist() {
-			   if (minDist != INFINITY) {
-				   return minDist;
-			   }
-			   else {
-				   return -1;
-			   }
-		   }
-		   public int getSAPAncestor() {
-			   if (minDist != INFINITY) {
-				   return ancestor;
-			   }
-			   else {
-				   return -1;
-			   }
-		   }
-		   public int getNumVisited() {
-			   return numVisited;
-		   }
-	   }
+			int numVisited = 0;
+
+			public FindSAP(int v, int w) {
+				// trivial case test
+				if (v == w) {
+					ancestor = v;
+					minDist = 0;
+					return;
+				}	
+
+				alien2me = new HashMap<Integer, Integer>();
+				me2alien = new ArrayList<Integer>();
+				root = new ArrayList<Integer>();
+				dist = new ArrayList<Integer>();
+				Queue<Integer> q = new Queue<Integer>();
+
+				q.enqueue(0);
+				alien2me.put(v, 0);
+				me2alien.add(v);
+				dist.add(0);
+				root.add(0);
+
+				q.enqueue(1);
+				alien2me.put(w, 1);
+				me2alien.add(w);
+				dist.add(0);
+				root.add(1);
+
+				sapBFS(q);
+			}
+			public FindSAP(Iterable<Integer> v, Iterable<Integer> w) {
+				// trivial case test
+				for (int v1 : v) {
+					for (int w1 : w) {
+						if (v1 == w1) {
+							ancestor = v1;
+							minDist = 0;
+							return;
+						}
+					}
+				}	
+
+				alien2me = new HashMap<Integer, Integer>();
+				me2alien = new ArrayList<Integer>();
+				root = new ArrayList<Integer>();
+				Queue<Integer> q = new Queue<Integer>();
+				for (int s : v) {					
+					me2alien.add(s);
+					dist.add(0);
+					root.add(0);
+					q.enqueue(dist.size() - 1);
+					alien2me.put(s, dist.size() - 1);
+				}
+				for (int s : w) {
+					me2alien.add(s);
+					dist.add(0);
+					root.add(0);
+					q.enqueue(dist.size() - 1);
+					alien2me.put(s, dist.size() - 1);
+				}			
+
+				sapBFS(q);
+			}
+			private void sapBFS(Queue<Integer> q) {
+				while (!q.isEmpty()) {
+					int v = q.dequeue();
+
+					for(int alien: G.adj(me2alien.get(v))) {
+						Integer me = alien2me.get(alien);
+
+						if (me == null) {
+							alien2me.put(alien, me = me2alien.size());
+
+							alien2me.put(alien, me);
+							me2alien.add(alien);
+							dist.add(dist.get(v) + 1);
+							root.add(root.get(v));
+
+							q.enqueue(me);
+						}
+						else if (root.get(me) != root.get(v)) {
+							// eureka!
+							minDist = dist.get(me) + dist.get(v) + 1;
+							ancestor = me;
+
+							return;
+						}
+						else {
+							// cyclic 8-(
+						}
+					}
+				}
+			}
+
+			public int getSAPDist() {
+				return (minDist != INFINITY)? minDist : -1;
+			}
+
+			public int getSAPAncestor() {
+				return (minDist != INFINITY)? ancestor : -1; 
+			}
+
+			public int getNumVisited() {
+				return numVisited;
+			}
+		}
+
 	   
 	   private void printArray(int[] array) {
 		   for (int i = 0; i < array.length; i++) {
