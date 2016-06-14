@@ -299,13 +299,12 @@ public class SAP {
 	   public static void main(String[] args) {
 //		   In in = new In(args[0]);
 		   
-//		   int numVisited = 0;
-//		   In in = new In("wordnet\\digraph_test2.txt");
-//		   Digraph G = new Digraph(in);		   
-//		   SAP sap = new SAP(G);		   
-//		   StdOut.println("length: " + sap.length(1, 2) + " ancestor: "+ sap.ancestor(1, 2));
-//		   numVisited += sap.numVisited;
-//		   StdOut.println(numVisited);
+		   int numVisited = 0;
+		   In in = new In("wordnet\\digraph1.txt");
+		   Digraph G = new Digraph(in);		   
+		   SAP sap = new SAP(G);		   
+		   StdOut.println("length: " + sap.length(3, 8) + " ancestor: "+ sap.ancestor(3, 8));
+		   StdOut.println(numVisited);
 		   
 //		   int numVisited = 0;
 //		   In in = new In("wordnet\\digraph-wordnet.txt");
@@ -314,27 +313,27 @@ public class SAP {
 //		   StdOut.println("length: " + sap.length(23231, 23302) + " ancestor: "+ sap.ancestor(23231, 23302));
 //		   StdOut.println(numVisited);
 		   
-		   In in = new In("wordnet\\digraph-wordnet.txt");
-		   Digraph G = new Digraph(in);		   
-		   SAP sap = new SAP(G);
-		   Random rand = new Random();		   
-		   int min = 0;
-		   int max = 82191;
-		   int numCalls = 100000;
-		   int randomNum1, randomNum2;
-		   int numVisited = 0;
-		   long startTime = System.nanoTime();
-		   for (int i = 0; i < numCalls; i++) {			   
-			   randomNum1 = rand.nextInt((max - min) + 1) + min;
-			   randomNum2 = rand.nextInt((max - min) + 1) + min;
-			   sap.length(randomNum1, randomNum2);
-		   }
-		   long time = System.nanoTime() - startTime;
-		   double callSec = numCalls  / (double) time;
-		   StdOut.println("time elapsed in during calls: " + time);
-		   StdOut.println("calls / sec: " + callSec* 1000000000);
-		   StdOut.println(numVisited);
-		   StdOut.println("avg. vertices visited per call: " +  (numVisited / (double) numCalls));
+//		   In in = new In("wordnet\\digraph-wordnet.txt");
+//		   Digraph G = new Digraph(in);		   
+//		   SAP sap = new SAP(G);
+//		   Random rand = new Random();		   
+//		   int min = 0;
+//		   int max = 82191;
+//		   int numCalls = 100000;
+//		   int randomNum1, randomNum2;
+//		   int numVisited = 0;
+//		   long startTime = System.nanoTime();
+//		   for (int i = 0; i < numCalls; i++) {			   
+//			   randomNum1 = rand.nextInt((max - min) + 1) + min;
+//			   randomNum2 = rand.nextInt((max - min) + 1) + min;
+//			   sap.length(randomNum1, randomNum2);
+//		   }
+//		   long time = System.nanoTime() - startTime;
+//		   double callSec = numCalls  / (double) time;
+//		   StdOut.println("time elapsed in during calls: " + time);
+//		   StdOut.println("calls / sec: " + callSec* 1000000000);
+//		   StdOut.println(numVisited);
+//		   StdOut.println("avg. vertices visited per call: " +  (numVisited / (double) numCalls));
 		   
 //		    while (!StdIn.isEmpty()) {
 //		        int v = StdIn.readInt();
