@@ -230,8 +230,7 @@ public class SAP {
 
 						if (me == null) {
 							alien2me.put(alien, me = me2alien.size());
-
-							alien2me.put(alien, me);
+//							alien2me.put(alien, me); // why?
 							me2alien.add(alien);
 							dist.add(dist.get(v) + 1);
 							root.add(root.get(v));
