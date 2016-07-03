@@ -304,10 +304,10 @@ public class SAP {
 		   In in = new In("wordnet\\digraph1.txt");
 		   Digraph G = new Digraph(in);		   
 		   SAP sap = new SAP(G);		   
-		   StdOut.println("length: " + sap.length(3, 8) + " ancestor: "+ sap.ancestor(3, 8));
+		   StdOut.println("length: " + sap.length(3, 12) + " ancestor: "+ sap.ancestor(3, 12));
 		   StdOut.println(numVisited);
 		   
-//		   int numVisited = 0;
+//		   int numVisited = 0;;
 //		   In in = new In("wordnet\\digraph-wordnet.txt");
 //		   Digraph G = new Digraph(in);		   
 //		   SAP sap = new SAP(G);		   
