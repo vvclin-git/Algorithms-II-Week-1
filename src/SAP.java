@@ -178,13 +178,13 @@ public class SAP {
 				alien2me.put(v, 0);
 				me2alien.add(v);
 				dist.add(0);
-				root.add(0);
+				root.add(v);
 
 				q.enqueue(1);
 				alien2me.put(w, 1);
 				me2alien.add(w);
 				dist.add(0);
-				root.add(1);
+				root.add(w);
 
 				sapBFS(q);
 			}
@@ -240,8 +240,9 @@ public class SAP {
 						else if (root.get(me) != root.get(v)) {
 							// eureka!
 							minDist = dist.get(me) + dist.get(v) + 1;
-							ancestor = me;
-
+//							ancestor = me;
+							ancestor = me2alien.get(me);
+//							StdOut.println(alien2me.keySet().toString());
 							return;
 						}
 						else {
@@ -249,6 +250,7 @@ public class SAP {
 						}
 					}
 				}
+				
 			}
 
 			public int getSAPDist() {
