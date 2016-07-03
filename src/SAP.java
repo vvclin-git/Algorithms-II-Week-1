@@ -402,6 +402,7 @@ public class SAP {
 			   randomNum2 = rand.nextInt((max - min) + 1) + min;
 			   length = sap.length(randomNum1, randomNum2);
 			   ancestor = sap.ancestor(randomNum1, randomNum2);
+			   // v, w, length, ancestor
 			   out.println(randomNum1 + "," + randomNum2 + "," + length + "," + ancestor);
 //			   numVisited += sap.numVisited;
 		   }
