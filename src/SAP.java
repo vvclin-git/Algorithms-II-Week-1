@@ -386,22 +386,26 @@ public class SAP {
 //		   StdOut.println(numVisited);
 		   
 		   In in = new In("wordnet\\digraph-wordnet.txt");
+		   Out out = new Out("wordnet\\records.txt"); // for result recordings
 		   Digraph G = new Digraph(in);		   
 		   SAP sap = new SAP(G);
 		   Random rand = new Random();		   
 		   int min = 0;
 		   int max = 82191;
-		   int numCalls = 100000;
+		   int numCalls = 100;
 		   int randomNum1, randomNum2;
 		   int numVisited = 0;
+		   int length, ancestor;
 		   long startTime = System.nanoTime();
 		   for (int i = 0; i < numCalls; i++) {			   
 			   randomNum1 = rand.nextInt((max - min) + 1) + min;
 			   randomNum2 = rand.nextInt((max - min) + 1) + min;
-			   sap.length(randomNum1, randomNum2);
-			   sap.ancestor(randomNum1, randomNum2);
+			   length = sap.length(randomNum1, randomNum2);
+			   ancestor = sap.ancestor(randomNum1, randomNum2);
+			   out.println(randomNum1 + "," + randomNum2 + "," + length + "," + ancestor);
 //			   numVisited += sap.numVisited;
 		   }
+		   out.close();
 		   long time = System.nanoTime() - startTime;
 		   double callSec = numCalls  / (double) time;
 		   StdOut.println("time elapsed in during calls: " + time);
