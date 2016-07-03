@@ -392,7 +392,7 @@ public class SAP {
 		   Random rand = new Random();		   
 		   int min = 0;
 		   int max = 82191;
-		   int numCalls = 100;
+		   int numCalls = 10000;
 		   int randomNum1, randomNum2;
 		   int numVisited = 0;
 		   int length, ancestor;
