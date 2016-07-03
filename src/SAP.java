@@ -300,12 +300,37 @@ public class SAP {
 	   public static void main(String[] args) {
 //		   In in = new In(args[0]);
 		   
-		   int numVisited = 0;
-		   In in = new In("wordnet\\digraph1.txt");
-		   Digraph G = new Digraph(in);		   
-		   SAP sap = new SAP(G);		   
-		   StdOut.println("length: " + sap.length(3, 12) + " ancestor: "+ sap.ancestor(3, 12));
-		   StdOut.println(numVisited);
+		   // correctenss tester		   
+		   In inGraph = new In("wordnet\\digraph-wordnet.txt");
+		   In inRecord = new In("wordnet\\records.txt");
+		   String recordLine;
+		   String[] record;
+		   Digraph G = new Digraph(inGraph);		   
+		   SAP sap = new SAP(G);
+		   int v, w, length, ancestor, numTests = 0, numFails = 0;
+		   while (inRecord.hasNextLine()) {
+			   recordLine = inRecord.readLine();
+			   numTests ++;
+			   record = recordLine.split(",");
+			   v = Integer.parseInt(record[0]);
+			   w = Integer.parseInt(record[1]);
+			   length = sap.length(v, w);
+			   ancestor = sap.ancestor(v, w);
+			   if (Integer.parseInt(record[2]) != length | Integer.parseInt(record[3]) != ancestor) {
+				   StdOut.print("error with v = " + v + ", w = " + w);
+				   if (Integer.parseInt(record[2]) != length) {
+					   StdOut.print("| expected length: " + Integer.parseInt(record[2]));
+					   StdOut.print(" actual length: " + length);
+				   }
+				   if (Integer.parseInt(record[3]) != ancestor) {
+					   StdOut.print("| expected ancestor: " + Integer.parseInt(record[3]));
+					   StdOut.print(" actual ancestor: " + ancestor);
+				   }
+				   StdOut.println();
+				   numFails ++;
+			   }
+		   }
+		   StdOut.println("test result: " + (numTests - numFails) + " / " + numTests + " passed");
 		   
 //		   int numVisited = 0;;
 //		   In in = new In("wordnet\\digraph-wordnet.txt");
@@ -314,6 +339,7 @@ public class SAP {
 //		   StdOut.println("length: " + sap.length(23231, 23302) + " ancestor: "+ sap.ancestor(23231, 23302));
 //		   StdOut.println(numVisited);
 		   
+		   // performance tester
 //		   In in = new In("wordnet\\digraph-wordnet.txt");
 //		   Digraph G = new Digraph(in);		   
 //		   SAP sap = new SAP(G);
